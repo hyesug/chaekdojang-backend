@@ -18,6 +18,9 @@ api/HELP.md
 .DS_Store
 Thumbs.db
 
+# Local secrets
+**/application-local.yaml
+
 # Compiled class file
 *.class
 
