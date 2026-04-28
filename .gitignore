@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+api/.gradle/
+api/build/
+!api/gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+api/out/
+
+# Spring Boot
+api/HELP.md
+
+# OS
+.DS_Store
+Thumbs.db
