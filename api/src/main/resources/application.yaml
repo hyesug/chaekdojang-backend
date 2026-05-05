@@ -14,6 +14,17 @@ spring:
   sql:
     init:
       platform: postgresql
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_USERNAME:}
+    password: ${GMAIL_APP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
   secret: ${JWT_SECRET:chaekingam-dev-secret-key-must-be-32chars-ok!}
@@ -24,6 +35,9 @@ server:
     encoding:
       charset: UTF-8
       force: true
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}
 
 kakao:
   api-key: 097ff9ac51c1f1d29ba4bc83aeff3243

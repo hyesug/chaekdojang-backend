@@ -61,4 +61,8 @@ public class User {
         this.language = "ko";
         this.country = "KR";
     }
+
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }

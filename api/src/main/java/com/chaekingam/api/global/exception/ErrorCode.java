@@ -22,7 +22,8 @@ public enum ErrorCode {
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요 기록이 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
     LIBRARY_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 서재에 있는 책입니다."),
-    LIBRARY_NOT_FOUND(HttpStatus.NOT_FOUND, "서재 항목을 찾을 수 없습니다.");
+    LIBRARY_NOT_FOUND(HttpStatus.NOT_FOUND, "서재 항목을 찾을 수 없습니다."),
+    INVALID_RESET_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않거나 만료된 재설정 링크입니다.");
 
     private final HttpStatus status;
     private final String message;
