@@ -10,6 +10,7 @@ public record ReviewResponse(
         Long id,
         AuthorInfo author,
         BookInfo book,
+        String title,
         String content,
         int rating,
         LocalDateTime createdAt,
@@ -32,7 +33,8 @@ public record ReviewResponse(
         return new ReviewResponse(
                 review.getId(),
                 AuthorInfo.from(review.getAuthor()),
-                BookInfo.from(review.getBook()),
+                review.getBook() != null ? BookInfo.from(review.getBook()) : null,
+                review.getTitle(),
                 review.getContent(),
                 review.getRating(),
                 review.getCreatedAt(),

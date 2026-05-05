@@ -30,12 +30,16 @@ public class ReviewService {
         Long userId = SecurityUtils.getCurrentUserId();
         User author = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        Book book = bookRepository.findById(request.bookId())
-                .orElseThrow(() -> new CustomException(ErrorCode.BOOK_NOT_FOUND));
+        Book book = null;
+        if (request.bookId() != null) {
+            book = bookRepository.findById(request.bookId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.BOOK_NOT_FOUND));
+        }
 
         Review review = Review.builder()
                 .author(author)
                 .book(book)
+                .title(request.title())
                 .content(request.content())
                 .rating(request.rating())
                 .build();
@@ -60,7 +64,7 @@ public class ReviewService {
         if (!review.isAuthor(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
-        review.update(request.content(), request.rating());
+        review.update(request.title(), request.content(), request.rating());
         return ReviewResponse.from(review);
     }
 

@@ -140,4 +140,5 @@ fix(book): 카카오 API 검색 결과 null 처리
 ### 커밋 타이밍
 - 기능 단위로 커밋
 - 빌드·테스트 통과 후에만 커밋
-- 작업 완료 후 자동으로 git add . && git commit && git push 실행
+- 작업 완료 후 반드시 git add . && git commit && git push origin main 순서대로 실행한다
+- push까지 완료된 것을 확인한 후에만 작업 완료 선언한다

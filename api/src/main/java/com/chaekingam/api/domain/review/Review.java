@@ -26,12 +26,15 @@ public class Review {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
+    @JoinColumn(name = "book_id")
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
+
+    @Column(nullable = false)
+    private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
@@ -53,14 +56,16 @@ public class Review {
     private LocalDateTime deletedAt;
 
     @Builder
-    private Review(Book book, User author, String content, int rating) {
+    private Review(Book book, User author, String title, String content, int rating) {
         this.book = book;
         this.author = author;
+        this.title = title;
         this.content = content;
         this.rating = rating;
     }
 
-    public void update(String content, int rating) {
+    public void update(String title, String content, int rating) {
+        this.title = title;
         this.content = content;
         this.rating = rating;
     }
