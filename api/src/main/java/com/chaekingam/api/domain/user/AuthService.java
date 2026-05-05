@@ -32,6 +32,9 @@ public class AuthService {
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
+    @Value("${app.backend-url}")
+    private String backendUrl;
+
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
@@ -72,7 +75,7 @@ public class AuthService {
                     .build();
             resetTokenRepository.save(resetToken);
 
-            String resetLink = frontendUrl + "/reset-password?token=" + token;
+            String resetLink = backendUrl + "/reset-password.html?token=" + token;
             emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
         });
     }

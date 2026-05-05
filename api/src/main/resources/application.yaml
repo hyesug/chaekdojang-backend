@@ -38,6 +38,7 @@ server:
 
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
+  backend-url: ${BACKEND_URL:http://localhost:8080}
 
 kakao:
   api-key: 097ff9ac51c1f1d29ba4bc83aeff3243
