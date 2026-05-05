@@ -21,6 +21,9 @@ Thumbs.db
 # Local secrets
 **/application-local.yaml
 
+# Claude Code local settings
+.claude/settings.local.json
+
 # Compiled class file
 *.class
 

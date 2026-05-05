@@ -14,3 +14,19 @@ spring:
   sql:
     init:
       platform: postgresql
+
+jwt:
+  secret: ${JWT_SECRET:chaekingam-dev-secret-key-must-be-32chars-ok!}
+  expiration-ms: 86400000
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+kakao:
+  api-key: 097ff9ac51c1f1d29ba4bc83aeff3243
+
+google:
+  api-key: AIzaSyDjJARV5hYcuhAmmnHNCTS7GBqMOB7N8N0
