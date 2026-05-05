@@ -29,8 +29,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/reviews", "/api/reviews/**").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/books/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET,
+                        "/api/reviews", "/api/reviews/**",
+                        "/api/books/**",
+                        "/api/users/*/followers", "/api/users/*/followings"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
