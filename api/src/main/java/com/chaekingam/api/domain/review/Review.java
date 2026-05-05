@@ -33,10 +33,7 @@ public class Review {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Min(1)
@@ -56,16 +53,14 @@ public class Review {
     private LocalDateTime deletedAt;
 
     @Builder
-    private Review(Book book, User author, String title, String content, int rating) {
+    private Review(Book book, User author, String content, int rating) {
         this.book = book;
         this.author = author;
-        this.title = title;
         this.content = content;
         this.rating = rating;
     }
 
-    public void update(String title, String content, int rating) {
-        this.title = title;
+    public void update(String content, int rating) {
         this.content = content;
         this.rating = rating;
     }

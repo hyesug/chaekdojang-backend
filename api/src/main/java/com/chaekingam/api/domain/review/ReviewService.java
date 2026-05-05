@@ -39,7 +39,6 @@ public class ReviewService {
         Review review = Review.builder()
                 .author(author)
                 .book(book)
-                .title(request.title())
                 .content(request.content())
                 .rating(request.rating())
                 .build();
@@ -64,7 +63,7 @@ public class ReviewService {
         if (!review.isAuthor(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
-        review.update(request.title(), request.content(), request.rating());
+        review.update(request.content(), request.rating());
         return ReviewResponse.from(review);
     }
 

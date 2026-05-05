@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 
 public record ReviewCreateRequest(
         Long bookId,
-        @NotBlank String title,
         @NotBlank String content,
         @Min(1) @Max(5) int rating
 ) {
