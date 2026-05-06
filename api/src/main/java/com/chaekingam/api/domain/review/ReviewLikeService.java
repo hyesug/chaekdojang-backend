@@ -43,4 +43,9 @@ public class ReviewLikeService {
     public long countLikes(Long reviewId) {
         return reviewLikeRepository.countByReviewId(reviewId);
     }
+
+    public boolean isLiked(Long reviewId) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        return reviewLikeRepository.existsByReviewIdAndUserId(reviewId, userId);
+    }
 }

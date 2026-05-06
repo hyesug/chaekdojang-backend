@@ -35,4 +35,10 @@ public class ReviewLikeController {
     public ApiResponse<Long> count(@PathVariable Long reviewId) {
         return ApiResponse.ok(reviewLikeService.countLikes(reviewId));
     }
+
+    @Operation(summary = "좋아요 여부 확인", description = "로그인한 사용자가 해당 독후감에 좋아요를 눌렀는지 반환합니다. JWT 필요.")
+    @GetMapping("/status")
+    public ApiResponse<Boolean> status(@PathVariable Long reviewId) {
+        return ApiResponse.ok(reviewLikeService.isLiked(reviewId));
+    }
 }
