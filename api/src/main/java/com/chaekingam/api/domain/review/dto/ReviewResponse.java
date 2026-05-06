@@ -12,6 +12,8 @@ public record ReviewResponse(
         BookInfo book,
         String content,
         int rating,
+        long likeCount,
+        long commentCount,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
@@ -28,13 +30,15 @@ public record ReviewResponse(
         }
     }
 
-    public static ReviewResponse from(Review review) {
+    public static ReviewResponse from(Review review, long likeCount, long commentCount) {
         return new ReviewResponse(
                 review.getId(),
                 AuthorInfo.from(review.getAuthor()),
                 review.getBook() != null ? BookInfo.from(review.getBook()) : null,
                 review.getContent(),
                 review.getRating(),
+                likeCount,
+                commentCount,
                 review.getCreatedAt(),
                 review.getUpdatedAt()
         );

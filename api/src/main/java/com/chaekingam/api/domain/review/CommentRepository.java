@@ -10,4 +10,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAllByReviewIdAndDeletedAtIsNullOrderByCreatedAtAsc(Long reviewId);
 
     Optional<Comment> findByIdAndDeletedAtIsNull(Long id);
+
+    long countByReviewIdAndDeletedAtIsNull(Long reviewId);
 }

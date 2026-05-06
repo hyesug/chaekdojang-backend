@@ -24,6 +24,8 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public ReviewResponse create(ReviewCreateRequest request) {
@@ -42,18 +44,26 @@ public class ReviewService {
                 .content(request.content())
                 .rating(request.rating())
                 .build();
-        return ReviewResponse.from(reviewRepository.save(review));
+        Review saved = reviewRepository.save(review);
+        return ReviewResponse.from(saved,
+                reviewLikeRepository.countByReviewId(saved.getId()),
+                commentRepository.countByReviewIdAndDeletedAtIsNull(saved.getId()));
     }
 
     public List<ReviewResponse> getAll() {
         return reviewRepository.findAllByDeletedAtIsNullOrderByCreatedAtDesc()
                 .stream()
-                .map(ReviewResponse::from)
+                .map(r -> ReviewResponse.from(r,
+                        reviewLikeRepository.countByReviewId(r.getId()),
+                        commentRepository.countByReviewIdAndDeletedAtIsNull(r.getId())))
                 .toList();
     }
 
     public ReviewResponse getOne(Long id) {
-        return ReviewResponse.from(findActiveReview(id));
+        Review review = findActiveReview(id);
+        return ReviewResponse.from(review,
+                reviewLikeRepository.countByReviewId(review.getId()),
+                commentRepository.countByReviewIdAndDeletedAtIsNull(review.getId()));
     }
 
     @Transactional
@@ -64,7 +74,9 @@ public class ReviewService {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
         review.update(request.content(), request.rating());
-        return ReviewResponse.from(review);
+        return ReviewResponse.from(review,
+                reviewLikeRepository.countByReviewId(review.getId()),
+                commentRepository.countByReviewIdAndDeletedAtIsNull(review.getId()));
     }
 
     @Transactional
