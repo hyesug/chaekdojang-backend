@@ -10,4 +10,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findAllByDeletedAtIsNullOrderByCreatedAtDesc();
 
     Optional<Review> findByIdAndDeletedAtIsNull(Long id);
+
+    List<Review> findAllByAuthorIdAndDeletedAtIsNullOrderByCreatedAtDesc(Long authorId);
+
+    long countByAuthorIdAndDeletedAtIsNull(Long authorId);
+
+    List<Review> findAllByAuthorIdInAndDeletedAtIsNullOrderByCreatedAtDesc(List<Long> authorIds);
 }

@@ -12,7 +12,8 @@ public record GoogleBookResponse(
             List<String> authors,
             String publisher,
             List<IndustryIdentifier> industryIdentifiers,
-            ImageLinks imageLinks
+            ImageLinks imageLinks,
+            List<String> categories
     ) {}
 
     public record IndustryIdentifier(String type, String identifier) {}

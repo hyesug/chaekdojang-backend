@@ -35,6 +35,9 @@ public class Book {
     @Column
     private String thumbnail;
 
+    @Column(length = 100)
+    private String category;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private BookSource source;
@@ -48,12 +51,13 @@ public class Book {
 
     @Builder
     private Book(String isbn13, String title, String author, String publisher,
-                 String thumbnail, BookSource source) {
+                 String thumbnail, BookSource source, String category) {
         this.isbn13 = isbn13;
         this.title = title;
         this.author = author;
         this.publisher = publisher;
         this.thumbnail = thumbnail;
         this.source = source;
+        this.category = category;
     }
 }

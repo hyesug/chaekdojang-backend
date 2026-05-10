@@ -55,4 +55,10 @@ public class ReviewController {
     public void delete(@PathVariable Long id) {
         reviewService.delete(id);
     }
+
+    @Operation(summary = "팔로잉 피드", description = "내가 팔로우한 사람들의 독후감을 최신순으로 반환합니다. JWT 필요.")
+    @GetMapping("/feed")
+    public ApiResponse<List<ReviewResponse>> getFeed() {
+        return ApiResponse.ok(reviewService.getFeed());
+    }
 }

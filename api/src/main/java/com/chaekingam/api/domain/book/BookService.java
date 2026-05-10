@@ -40,6 +40,13 @@ public class BookService {
                 .toList();
     }
 
+    public List<BookResponse> findByCategory(String category) {
+        return bookRepository.findAllByCategoryContainingIgnoreCase(category)
+                .stream()
+                .map(BookResponse::from)
+                .toList();
+    }
+
     private Book upsertBook(BookSearchResult result) {
         return bookRepository.findByIsbn13(result.isbn13())
                 .orElseGet(() -> bookRepository.save(
@@ -50,6 +57,7 @@ public class BookService {
                                 .publisher(result.publisher())
                                 .thumbnail(result.thumbnail())
                                 .source(result.source())
+                                .category(result.category())
                                 .build()
                 ));
     }

@@ -28,4 +28,12 @@ public class BookController {
             @RequestParam String q) {
         return ApiResponse.ok(bookService.search(q));
     }
+
+    @Operation(summary = "카테고리별 도서 조회", description = "특정 카테고리에 속한 도서 목록을 반환합니다. 인증 불필요.")
+    @GetMapping("/category")
+    public ApiResponse<List<BookResponse>> getByCategory(
+            @Parameter(description = "카테고리명 (예: 소설, 자기계발)", required = true)
+            @RequestParam String name) {
+        return ApiResponse.ok(bookService.findByCategory(name));
+    }
 }

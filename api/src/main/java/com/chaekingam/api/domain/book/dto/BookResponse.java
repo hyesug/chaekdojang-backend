@@ -9,7 +9,8 @@ public record BookResponse(
         String author,
         String publisher,
         String thumbnail,
-        String source
+        String source,
+        String category
 ) {
     public static BookResponse from(Book book) {
         return new BookResponse(
@@ -19,7 +20,8 @@ public record BookResponse(
                 book.getAuthor(),
                 book.getPublisher(),
                 book.getThumbnail(),
-                book.getSource().name()
+                book.getSource().name(),
+                book.getCategory()
         );
     }
 }

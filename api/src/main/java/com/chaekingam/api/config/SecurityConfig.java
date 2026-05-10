@@ -40,10 +40,19 @@ public class SecurityConfig {
                         "/swagger-ui.html", "/swagger-ui/**",
                         "/v3/api-docs", "/v3/api-docs/**"
                 ).permitAll()
+                // 인증 필요한 GET — 와일드카드보다 먼저 선언해야 첫 번째 매칭 규칙이 적용됨
+                .requestMatchers(org.springframework.http.HttpMethod.GET,
+                        "/api/reviews/feed",
+                        "/api/users/me",
+                        "/api/users/*/follow/status"
+                ).authenticated()
+                // 공개 GET 엔드포인트
                 .requestMatchers(org.springframework.http.HttpMethod.GET,
                         "/api/reviews", "/api/reviews/**",
                         "/api/books/**",
-                        "/api/users/*/followers", "/api/users/*/followings"
+                        "/api/users/*/followers", "/api/users/*/followings",
+                        "/api/users/*/reviews",
+                        "/api/users/*"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

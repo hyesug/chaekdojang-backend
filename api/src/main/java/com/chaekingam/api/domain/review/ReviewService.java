@@ -5,6 +5,7 @@ import com.chaekingam.api.domain.book.BookRepository;
 import com.chaekingam.api.domain.review.dto.ReviewCreateRequest;
 import com.chaekingam.api.domain.review.dto.ReviewResponse;
 import com.chaekingam.api.domain.review.dto.ReviewUpdateRequest;
+import com.chaekingam.api.domain.user.FollowRepository;
 import com.chaekingam.api.domain.user.User;
 import com.chaekingam.api.domain.user.UserRepository;
 import com.chaekingam.api.global.exception.CustomException;
@@ -26,6 +27,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final CommentRepository commentRepository;
+    private final FollowRepository followRepository;
 
     @Transactional
     public ReviewResponse create(ReviewCreateRequest request) {
@@ -87,6 +89,27 @@ public class ReviewService {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
         review.softDelete();
+    }
+
+    public List<ReviewResponse> getByUser(Long userId) {
+        return reviewRepository.findAllByAuthorIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(r -> ReviewResponse.from(r,
+                        reviewLikeRepository.countByReviewId(r.getId()),
+                        commentRepository.countByReviewIdAndDeletedAtIsNull(r.getId())))
+                .toList();
+    }
+
+    public List<ReviewResponse> getFeed() {
+        Long userId = SecurityUtils.getCurrentUserId();
+        List<Long> followingIds = followRepository.findFollowingIdsByFollowerId(userId);
+        if (followingIds.isEmpty()) return List.of();
+        return reviewRepository.findAllByAuthorIdInAndDeletedAtIsNullOrderByCreatedAtDesc(followingIds)
+                .stream()
+                .map(r -> ReviewResponse.from(r,
+                        reviewLikeRepository.countByReviewId(r.getId()),
+                        commentRepository.countByReviewIdAndDeletedAtIsNull(r.getId())))
+                .toList();
     }
 
     private Review findActiveReview(Long id) {

@@ -8,6 +8,7 @@ public record BookSearchResult(
         String author,
         String publisher,
         String thumbnail,
-        BookSource source
+        BookSource source,
+        String category
 ) {
 }
