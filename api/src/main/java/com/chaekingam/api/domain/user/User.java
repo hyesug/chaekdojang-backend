@@ -65,4 +65,10 @@ public class User {
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
+
+    public void updateProfile(String nickname, String bio, String profileImage) {
+        if (nickname != null) this.nickname = nickname;
+        if (bio != null) this.bio = bio;
+        if (profileImage != null) this.profileImage = profileImage;
+    }
 }

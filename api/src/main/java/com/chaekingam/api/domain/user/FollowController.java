@@ -44,4 +44,10 @@ public class FollowController {
     public ApiResponse<List<UserSummary>> getFollowings(@PathVariable Long userId) {
         return ApiResponse.ok(followService.getFollowings(userId));
     }
+
+    @Operation(summary = "팔로우 여부 확인", description = "로그인한 사용자가 해당 유저를 팔로우 중인지 반환합니다. JWT 필요.")
+    @GetMapping("/{userId}/follow/status")
+    public ApiResponse<Boolean> isFollowing(@PathVariable Long userId) {
+        return ApiResponse.ok(followService.isFollowing(userId));
+    }
 }
