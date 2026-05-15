@@ -3,12 +3,15 @@ package com.chaekingam.api.domain.user;
 import com.chaekingam.api.domain.review.ReviewRepository;
 import com.chaekingam.api.domain.user.dto.UpdateProfileRequest;
 import com.chaekingam.api.domain.user.dto.UserProfileResponse;
+import com.chaekingam.api.domain.user.dto.UserSummary;
 import com.chaekingam.api.global.exception.CustomException;
 import com.chaekingam.api.global.exception.ErrorCode;
 import com.chaekingam.api.global.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +52,13 @@ public class UserService {
         long followerCount = followRepository.countByFollowingId(userId);
         long followingCount = followRepository.countByFollowerId(userId);
         return UserProfileResponse.of(user, reviewCount, followerCount, followingCount);
+    }
+
+    public List<UserSummary> searchUsers(String q) {
+        return userRepository.findByNicknameContainingIgnoreCase(q)
+                .stream()
+                .map(UserSummary::from)
+                .toList();
     }
 
     private User findUser(Long userId) {

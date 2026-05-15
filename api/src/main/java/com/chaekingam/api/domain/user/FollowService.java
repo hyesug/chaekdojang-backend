@@ -1,5 +1,7 @@
 package com.chaekingam.api.domain.user;
 
+import com.chaekingam.api.domain.notification.NotificationService;
+import com.chaekingam.api.domain.notification.NotificationType;
 import com.chaekingam.api.domain.user.dto.UserSummary;
 import com.chaekingam.api.global.exception.CustomException;
 import com.chaekingam.api.global.exception.ErrorCode;
@@ -17,6 +19,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public void follow(Long targetUserId) {
@@ -30,6 +33,7 @@ public class FollowService {
         User follower = findUser(currentUserId);
         User following = findUser(targetUserId);
         followRepository.save(Follow.builder().follower(follower).following(following).build());
+        notificationService.send(following, follower, NotificationType.FOLLOW, null);
     }
 
     @Transactional

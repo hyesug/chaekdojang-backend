@@ -1,5 +1,7 @@
 package com.chaekingam.api.domain.review;
 
+import com.chaekingam.api.domain.notification.NotificationService;
+import com.chaekingam.api.domain.notification.NotificationType;
 import com.chaekingam.api.domain.user.User;
 import com.chaekingam.api.domain.user.UserRepository;
 import com.chaekingam.api.global.exception.CustomException;
@@ -17,6 +19,7 @@ public class ReviewLikeService {
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public void like(Long reviewId) {
@@ -29,6 +32,7 @@ public class ReviewLikeService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         reviewLikeRepository.save(ReviewLike.builder().review(review).user(user).build());
+        notificationService.send(review.getAuthor(), user, NotificationType.LIKE, reviewId);
     }
 
     @Transactional

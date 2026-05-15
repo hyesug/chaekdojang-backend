@@ -1,5 +1,7 @@
 package com.chaekingam.api.domain.review;
 
+import com.chaekingam.api.domain.notification.NotificationService;
+import com.chaekingam.api.domain.notification.NotificationType;
 import com.chaekingam.api.domain.review.dto.CommentCreateRequest;
 import com.chaekingam.api.domain.review.dto.CommentResponse;
 import com.chaekingam.api.domain.user.User;
@@ -21,6 +23,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public CommentResponse create(Long reviewId, CommentCreateRequest request) {
@@ -34,7 +37,9 @@ public class CommentService {
                 .author(author)
                 .content(request.content())
                 .build();
-        return CommentResponse.from(commentRepository.save(comment));
+        Comment saved = commentRepository.save(comment);
+        notificationService.send(review.getAuthor(), author, NotificationType.COMMENT, reviewId);
+        return CommentResponse.from(saved);
     }
 
     public List<CommentResponse> getAll(Long reviewId) {

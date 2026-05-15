@@ -4,6 +4,7 @@ import com.chaekingam.api.domain.review.ReviewService;
 import com.chaekingam.api.domain.review.dto.ReviewResponse;
 import com.chaekingam.api.domain.user.dto.UpdateProfileRequest;
 import com.chaekingam.api.domain.user.dto.UserProfileResponse;
+import com.chaekingam.api.domain.user.dto.UserSummary;
 import com.chaekingam.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,5 +44,11 @@ public class UserController {
     @GetMapping("/{userId}/reviews")
     public ApiResponse<List<ReviewResponse>> getUserReviews(@PathVariable Long userId) {
         return ApiResponse.ok(reviewService.getByUser(userId));
+    }
+
+    @Operation(summary = "사용자 검색", description = "닉네임으로 사용자를 검색합니다. 인증 불필요.")
+    @GetMapping("/search")
+    public ApiResponse<List<UserSummary>> searchUsers(@RequestParam String q) {
+        return ApiResponse.ok(userService.searchUsers(q));
     }
 }
