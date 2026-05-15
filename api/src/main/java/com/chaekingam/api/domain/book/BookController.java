@@ -1,15 +1,14 @@
 package com.chaekingam.api.domain.book;
 
 import com.chaekingam.api.domain.book.dto.BookResponse;
+import com.chaekingam.api.domain.review.ReviewService;
+import com.chaekingam.api.domain.review.dto.ReviewResponse;
 import com.chaekingam.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +19,7 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
+    private final ReviewService reviewService;
 
     @Operation(summary = "도서 검색", description = "카카오 책 API와 Google Books API를 통합 검색합니다. 인증 불필요.")
     @GetMapping("/search")
@@ -35,5 +35,19 @@ public class BookController {
             @Parameter(description = "카테고리명 (예: 소설, 자기계발)", required = true)
             @RequestParam String name) {
         return ApiResponse.ok(bookService.findByCategory(name));
+    }
+
+    @Operation(summary = "도서 단건 조회", description = "도서 ID로 특정 책 정보를 반환합니다. 인증 불필요.")
+    @GetMapping("/{id}")
+    public ApiResponse<BookResponse> getOne(@PathVariable Long id) {
+        return ApiResponse.ok(bookService.findById(id));
+    }
+
+    @Operation(summary = "책별 독후감 목록", description = "특정 책에 대해 작성된 독후감 목록을 반환합니다. 인증 불필요.")
+    @GetMapping("/{id}/reviews")
+    public ApiResponse<List<ReviewResponse>> getReviewsByBook(
+            @Parameter(description = "책 ID", required = true)
+            @PathVariable Long id) {
+        return ApiResponse.ok(reviewService.getByBook(id));
     }
 }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,14 @@ public class ReviewController {
     @GetMapping
     public ApiResponse<List<ReviewResponse>> getAll() {
         return ApiResponse.ok(reviewService.getAll());
+    }
+
+    @Operation(summary = "독후감 피드 페이지네이션", description = "page, size 파라미터로 독후감을 페이지 단위로 조회합니다. 인증 불필요.")
+    @GetMapping("/paged")
+    public ApiResponse<Page<ReviewResponse>> getAllPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.ok(reviewService.getAllPaged(page, size));
     }
 
     @Operation(summary = "독후감 단건 조회", description = "독후감 ID로 특정 독후감을 조회합니다. 인증 불필요.")

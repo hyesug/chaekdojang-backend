@@ -12,6 +12,9 @@ import com.chaekingam.api.global.exception.CustomException;
 import com.chaekingam.api.global.exception.ErrorCode;
 import com.chaekingam.api.global.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +64,15 @@ public class ReviewService {
                 .toList();
     }
 
+    public Page<ReviewResponse> getAllPaged(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size,
+                org.springframework.data.domain.Sort.by("createdAt").descending());
+        return reviewRepository.findAllByDeletedAtIsNull(pageable)
+                .map(r -> ReviewResponse.from(r,
+                        reviewLikeRepository.countByReviewId(r.getId()),
+                        commentRepository.countByReviewIdAndDeletedAtIsNull(r.getId())));
+    }
+
     public ReviewResponse getOne(Long id) {
         Review review = findActiveReview(id);
         return ReviewResponse.from(review,
@@ -105,6 +117,15 @@ public class ReviewService {
         List<Long> followingIds = followRepository.findFollowingIdsByFollowerId(userId);
         if (followingIds.isEmpty()) return List.of();
         return reviewRepository.findAllByAuthorIdInAndDeletedAtIsNullOrderByCreatedAtDesc(followingIds)
+                .stream()
+                .map(r -> ReviewResponse.from(r,
+                        reviewLikeRepository.countByReviewId(r.getId()),
+                        commentRepository.countByReviewIdAndDeletedAtIsNull(r.getId())))
+                .toList();
+    }
+
+    public List<ReviewResponse> getByBook(Long bookId) {
+        return reviewRepository.findAllByBookIdAndDeletedAtIsNullOrderByCreatedAtDesc(bookId)
                 .stream()
                 .map(r -> ReviewResponse.from(r,
                         reviewLikeRepository.countByReviewId(r.getId()),

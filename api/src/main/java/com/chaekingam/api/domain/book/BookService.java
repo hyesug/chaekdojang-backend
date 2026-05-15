@@ -2,6 +2,8 @@ package com.chaekingam.api.domain.book;
 
 import com.chaekingam.api.domain.book.dto.BookResponse;
 import com.chaekingam.api.domain.book.dto.BookSearchResult;
+import com.chaekingam.api.global.exception.CustomException;
+import com.chaekingam.api.global.exception.ErrorCode;
 import com.chaekingam.api.infra.google.GoogleBookClient;
 import com.chaekingam.api.infra.kakao.KakaoBookClient;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,12 @@ public class BookService {
                 .map(this::upsertBook)
                 .map(BookResponse::from)
                 .toList();
+    }
+
+    public BookResponse findById(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOOK_NOT_FOUND));
+        return BookResponse.from(book);
     }
 
     public List<BookResponse> findByCategory(String category) {
