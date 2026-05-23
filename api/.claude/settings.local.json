@@ -4,7 +4,21 @@
       "Bash(./gradlew build *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(curl *)",
+      "Bash(./gradlew test *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\kysn2\\\\Desktop\\\\05_책인감\\\\chaekingam-api\\\\api\\\\src\\\\main\\\\java\\\\com\\\\chaekingam\\\\api\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\kysn2\\\\Desktop\\\\05_책인감\\\\chaekingam-api\\\\api\\\\src\\\\main\\\\java\\\\com\\\\chaekingam\\\\api\" -Recurse -Directory)",
+      "Bash(Select-Object FullName)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(Start-Process -NoNewWindow -FilePath \".\\\\gradlew.bat\" -ArgumentList \"bootRun\" -RedirectStandardOutput \"bootrun.log\" -RedirectStandardError \"bootrun-err.log\")",
+      "Bash(Start-Sleep -Seconds 20)",
+      "Bash(Invoke-RestMethod -Uri \"http://localhost:8080/actuator/health\" -Method GET)",
+      "Bash(ConvertTo-Json)",
+      "PowerShell(try { \\(Invoke-RestMethod -Uri \"http://localhost:8080/actuator/health\" -TimeoutSec 3\\).status } catch { \"not ready\" })",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:8080/actuator/health\" | ConvertTo-Json)",
+      "PowerShell(Get-Process *)"
     ]
   }
 }
