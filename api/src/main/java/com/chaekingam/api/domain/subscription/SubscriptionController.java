@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@RestController
+// @RestController  // 프리미엄 구독 추후 오픈 예정
 @RequestMapping("/api/subscriptions")
 @RequiredArgsConstructor
 public class SubscriptionController {
