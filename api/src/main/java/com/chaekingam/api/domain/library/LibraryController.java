@@ -1,6 +1,7 @@
 package com.chaekingam.api.domain.library;
 
 import com.chaekingam.api.domain.library.dto.LibraryAddRequest;
+import com.chaekingam.api.domain.library.dto.LibraryBookStatusResponse;
 import com.chaekingam.api.domain.library.dto.LibraryResponse;
 import com.chaekingam.api.domain.library.dto.LibraryUpdateRequest;
 import com.chaekingam.api.global.response.ApiResponse;
@@ -50,5 +51,11 @@ public class LibraryController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remove(@PathVariable Long id) {
         libraryService.remove(id);
+    }
+
+    @Operation(summary = "책 서재 담기 여부 확인", description = "특정 책이 내 서재에 있는지 확인합니다. JWT 필요.")
+    @GetMapping("/books/{bookId}/status")
+    public ApiResponse<LibraryBookStatusResponse> getBookStatus(@PathVariable Long bookId) {
+        return ApiResponse.ok(libraryService.getBookStatus(bookId));
     }
 }

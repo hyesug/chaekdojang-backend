@@ -3,6 +3,7 @@ package com.chaekingam.api.domain.library;
 import com.chaekingam.api.domain.book.Book;
 import com.chaekingam.api.domain.book.BookRepository;
 import com.chaekingam.api.domain.library.dto.LibraryAddRequest;
+import com.chaekingam.api.domain.library.dto.LibraryBookStatusResponse;
 import com.chaekingam.api.domain.library.dto.LibraryResponse;
 import com.chaekingam.api.domain.library.dto.LibraryUpdateRequest;
 import com.chaekingam.api.domain.user.User;
@@ -64,5 +65,12 @@ public class LibraryService {
         Library library = libraryRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.LIBRARY_NOT_FOUND));
         libraryRepository.delete(library);
+    }
+
+    public LibraryBookStatusResponse getBookStatus(Long bookId) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        return libraryRepository.findByUserIdAndBookId(userId, bookId)
+                .map(lib -> new LibraryBookStatusResponse(true, lib.getStatus(), lib.getId()))
+                .orElse(new LibraryBookStatusResponse(false, null, null));
     }
 }
