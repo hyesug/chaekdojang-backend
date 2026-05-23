@@ -1,7 +1,10 @@
 package com.chaekingam.api.config;
 
 import com.chaekingam.api.global.security.JwtAuthenticationFilter;
+import com.chaekingam.api.global.security.OAuthSuccessHandler;
+import com.chaekingam.api.global.security.OAuthUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -18,36 +19,43 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final OAuthUserService oAuthUserService;
+    private final OAuthSuccessHandler oAuthSuccessHandler;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // OAuth2 state 검증에 세션이 필요하므로 IF_REQUIRED 사용
+            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/reset-password.html").permitAll()
+                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers(
                         "/swagger-ui.html", "/swagger-ui/**",
                         "/v3/api-docs", "/v3/api-docs/**"
                 ).permitAll()
-                // 인증 필요한 GET — 와일드카드보다 먼저 선언해야 첫 번째 매칭 규칙이 적용됨
                 .requestMatchers(org.springframework.http.HttpMethod.GET,
                         "/api/reviews/feed",
                         "/api/users/me",
                         "/api/users/*/follow/status"
                 ).authenticated()
-                // 공개 GET 엔드포인트
                 .requestMatchers(org.springframework.http.HttpMethod.GET,
                         "/api/reviews", "/api/reviews/**",
                         "/api/books/**",
@@ -56,6 +64,16 @@ public class SecurityConfig {
                         "/api/users/*"
                 ).permitAll()
                 .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth -> oauth
+                .userInfoEndpoint(ui -> ui.userService(oAuthUserService))
+                .successHandler(oAuthSuccessHandler)
+                .failureHandler((req, res, ex) -> {
+                    log.error("[OAuth2 실패] provider={} error={} cause={}",
+                            req.getServletPath(), ex.getMessage(),
+                            ex.getCause() != null ? ex.getCause().getMessage() : "none");
+                    res.sendRedirect(frontendUrl + "/auth/login?error=oauth_failed");
+                })
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(e -> e
@@ -67,7 +85,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOrigins(List.of("http://localhost:3000", frontendUrl));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -77,13 +95,7 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    // @Component 필터가 서블릿 컨테이너에 자동 등록되는 것을 막아야 한다.
-    // 그렇지 않으면 SecurityContextHolder가 컨텍스트를 초기화할 때 JWT 인증이 무시된다.
+    // @Component 필터가 서블릿 컨테이너에 이중 등록되는 것을 방지
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter> jwtFilterRegistration(JwtAuthenticationFilter filter) {
         FilterRegistrationBean<JwtAuthenticationFilter> bean = new FilterRegistrationBean<>(filter);

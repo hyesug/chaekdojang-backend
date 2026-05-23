@@ -1,7 +1,6 @@
 package com.chaekingam.api.domain.user;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,8 +23,12 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private AuthProvider provider;
+
     @Column(nullable = false)
-    private String password;
+    private String providerId;
 
     @Column(nullable = false, unique = true)
     private String nickname;
@@ -53,17 +56,17 @@ public class User {
     @Column
     private LocalDateTime deletedAt;
 
-    @Builder
-    private User(String email, String password, String nickname) {
-        this.email = email;
-        this.password = password;
-        this.nickname = nickname;
-        this.language = "ko";
-        this.country = "KR";
-    }
-
-    public void changePassword(String encodedPassword) {
-        this.password = encodedPassword;
+    public static User createOAuth(String email, String providerId, String nickname,
+                                    String profileImage, AuthProvider provider) {
+        User user = new User();
+        user.email = email;
+        user.providerId = providerId;
+        user.provider = provider;
+        user.nickname = nickname;
+        user.profileImage = profileImage;
+        user.language = "ko";
+        user.country = "KR";
+        return user;
     }
 
     public void updateProfile(String nickname, String bio, String profileImage) {
