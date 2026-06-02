@@ -29,18 +29,13 @@ public class ReviewController {
         return ApiResponse.ok(reviewService.create(request));
     }
 
-    @Operation(summary = "독후감 피드 전체 조회", description = "모든 사용자의 독후감 목록을 반환합니다. 인증 불필요.")
+    @Operation(summary = "독후감 피드 조회",
+            description = "모든 사용자의 독후감을 최신순으로 페이지 단위 반환. page(기본 0), size(기본 10) 파라미터 지원.")
     @GetMapping
-    public ApiResponse<List<ReviewResponse>> getAll() {
-        return ApiResponse.ok(reviewService.getAll());
-    }
-
-    @Operation(summary = "독후감 피드 페이지네이션", description = "page, size 파라미터로 독후감을 페이지 단위로 조회합니다. 인증 불필요.")
-    @GetMapping("/paged")
-    public ApiResponse<Page<ReviewResponse>> getAllPaged(
+    public ApiResponse<Page<ReviewResponse>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.ok(reviewService.getAllPaged(page, size));
+        return ApiResponse.ok(reviewService.getAll(page, size));
     }
 
     @Operation(summary = "독후감 단건 조회", description = "독후감 ID로 특정 독후감을 조회합니다. 인증 불필요.")
@@ -53,8 +48,7 @@ public class ReviewController {
     @PutMapping("/{id}")
     public ApiResponse<ReviewResponse> update(
             @PathVariable Long id,
-            @RequestBody @Valid ReviewUpdateRequest request
-    ) {
+            @RequestBody @Valid ReviewUpdateRequest request) {
         return ApiResponse.ok(reviewService.update(id, request));
     }
 

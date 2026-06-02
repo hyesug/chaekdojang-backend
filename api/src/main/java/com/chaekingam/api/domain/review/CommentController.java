@@ -2,6 +2,7 @@ package com.chaekingam.api.domain.review;
 
 import com.chaekingam.api.domain.review.dto.CommentCreateRequest;
 import com.chaekingam.api.domain.review.dto.CommentResponse;
+import com.chaekingam.api.domain.review.dto.CommentUpdateRequest;
 import com.chaekingam.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,15 @@ public class CommentController {
     @GetMapping
     public ApiResponse<List<CommentResponse>> getAll(@PathVariable Long reviewId) {
         return ApiResponse.ok(commentService.getAll(reviewId));
+    }
+
+    @Operation(summary = "댓글 수정", description = "본인이 작성한 댓글을 수정합니다. JWT 필요.")
+    @PutMapping("/{commentId}")
+    public ApiResponse<CommentResponse> update(
+            @PathVariable Long reviewId,
+            @PathVariable Long commentId,
+            @RequestBody @Valid CommentUpdateRequest request) {
+        return ApiResponse.ok(commentService.update(reviewId, commentId, request));
     }
 
     @Operation(summary = "댓글 삭제", description = "본인이 작성한 댓글을 삭제합니다. JWT 필요.")

@@ -4,6 +4,7 @@ import com.chaekingam.api.domain.notification.NotificationService;
 import com.chaekingam.api.domain.notification.NotificationType;
 import com.chaekingam.api.domain.review.dto.CommentCreateRequest;
 import com.chaekingam.api.domain.review.dto.CommentResponse;
+import com.chaekingam.api.domain.review.dto.CommentUpdateRequest;
 import com.chaekingam.api.domain.user.User;
 import com.chaekingam.api.domain.user.UserRepository;
 import com.chaekingam.api.global.exception.CustomException;
@@ -47,6 +48,19 @@ public class CommentService {
                 .stream()
                 .map(CommentResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public CommentResponse update(Long reviewId, Long commentId, CommentUpdateRequest request) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Comment comment = commentRepository.findByIdAndDeletedAtIsNull(commentId)
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+        if (!comment.getReview().getId().equals(reviewId)) {
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+        if (!comment.isAuthor(userId)) throw new CustomException(ErrorCode.FORBIDDEN);
+        comment.update(request.content());
+        return CommentResponse.from(comment);
     }
 
     @Transactional
