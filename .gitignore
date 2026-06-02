@@ -20,6 +20,7 @@ Thumbs.db
 
 # Local secrets
 **/application-local.yaml
+.env
 
 # Claude Code local settings
 .claude/settings.local.json

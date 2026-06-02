@@ -1,0 +1,40 @@
+# 프로덕션용 docker-compose (EC2에서 실행)
+# PostgreSQL은 AWS RDS 사용 → db 서비스 없음
+# 사용법: docker-compose -f docker-compose.prod.yml up -d
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: chaekingam-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: ${DOCKERHUB_USERNAME}/chaekingam-api:latest
+    container_name: chaekingam-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"  # Nginx만 접근 가능, 외부 직접 접근 차단
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/chaekingam
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET}
+      NAVER_CLIENT_ID: ${NAVER_CLIENT_ID}
+      NAVER_CLIENT_SECRET: ${NAVER_CLIENT_SECRET}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+      BACKEND_URL: ${BACKEND_URL}
+    depends_on:
+      redis:
+        condition: service_healthy

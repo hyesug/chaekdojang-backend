@@ -65,6 +65,7 @@ jwt:
   expiration-ms: 86400000
 
 server:
+  forward-headers-strategy: native  # Nginx의 X-Forwarded-Proto 신뢰 → OAuth redirect URI가 https://로 생성됨
   servlet:
     encoding:
       charset: UTF-8
