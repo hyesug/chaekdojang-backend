@@ -76,7 +76,7 @@ app:
   backend-url: ${BACKEND_URL:http://localhost:8080}
 
 kakao:
-  api-key: 097ff9ac51c1f1d29ba4bc83aeff3243
+  api-key: ${KAKAO_API_KEY:}
 
 deepl:
   api-key: ${DEEPL_API_KEY:}
@@ -85,4 +85,4 @@ toss:
   secret-key: ${TOSS_SECRET_KEY:}
 
 google:
-  api-key: AIzaSyDjJARV5hYcuhAmmnHNCTS7GBqMOB7N8N0
+  api-key: ${GOOGLE_API_KEY:}
