@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -21,10 +23,20 @@ public class PurchaseLinkService {
     private final BookRepository bookRepository;
 
     public List<PurchaseLinkResponse> getLinks(Long bookId) {
-        return purchaseLinkRepository.findAllByBookId(bookId)
-                .stream()
-                .map(PurchaseLinkResponse::from)
-                .toList();
+        List<PurchaseLink> saved = purchaseLinkRepository.findAllByBookId(bookId);
+        if (!saved.isEmpty()) {
+            return saved.stream().map(PurchaseLinkResponse::from).toList();
+        }
+        // DB에 저장된 링크 없으면 책 제목 기반 검색 URL을 fallback으로 반환
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOOK_NOT_FOUND));
+        String encoded = URLEncoder.encode(book.getTitle(), StandardCharsets.UTF_8);
+        return List.of(
+                new PurchaseLinkResponse(null, PurchaseProvider.COUPANG,
+                        "https://www.coupang.com/np/search?q=" + encoded),
+                new PurchaseLinkResponse(null, PurchaseProvider.KYOBO,
+                        "https://search.kyobobook.co.kr/search?keyword=" + encoded)
+        );
     }
 
     @Transactional
