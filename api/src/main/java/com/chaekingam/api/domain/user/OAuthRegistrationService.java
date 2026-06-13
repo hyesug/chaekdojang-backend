@@ -1,5 +1,6 @@
 package com.chaekingam.api.domain.user;
 
+import com.chaekingam.api.global.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ public class OAuthRegistrationService {
 
     private final UserRepository userRepository;
     private final UserAuthProviderRepository authProviderRepository;
+    private final NotificationService notificationService;
 
     public record RegistrationResult(User user, boolean isNew) {}
 
@@ -54,6 +56,10 @@ public class OAuthRegistrationService {
         authProviderRepository.save(
                 UserAuthProvider.of(user, provider, info.providerId(), info.email(), info.profileImage())
         );
+
+        if (isNew) {
+            notificationService.sendSignupAlert(user.getEmail(), user.getNickname());
+        }
 
         return new RegistrationResult(user, isNew);
     }
