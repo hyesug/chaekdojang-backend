@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationService {
+public class AdminAlertService {
 
     private final JavaMailSender mailSender;
 
