@@ -2,7 +2,6 @@ package com.chaekingam.api.global.security;
 
 import com.chaekingam.api.domain.user.AuthProvider;
 import com.chaekingam.api.domain.user.OAuthRegistrationService;
-import com.chaekingam.api.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +29,9 @@ public class OAuthUserService extends DefaultOAuth2UserService {
             OAuth2User oauthUser = super.loadUser(request);
             log.info("[OAuth2] provider={} attributes={}", registrationId, oauthUser.getAttributes().keySet());
             AuthProvider provider = AuthProvider.valueOf(registrationId.toUpperCase());
-            User user = registrationService.getOrRegister(provider, oauthUser.getAttributes());
-            log.info("[OAuth2] 로그인 성공 provider={} userId={}", registrationId, user.getId());
-            return new OAuthUserPrincipal(user, oauthUser.getAttributes());
+            OAuthRegistrationService.RegistrationResult result = registrationService.getOrRegister(provider, oauthUser.getAttributes());
+            log.info("[OAuth2] 로그인 성공 provider={} userId={} isNew={}", registrationId, result.user().getId(), result.isNew());
+            return new OAuthUserPrincipal(result.user(), oauthUser.getAttributes(), result.isNew());
         } catch (Exception e) {
             log.error("[OAuth2] loadUser 실패 provider={} error={}", registrationId, e.getMessage(), e);
             throw e;

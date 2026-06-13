@@ -29,6 +29,9 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException {
         OAuthUserPrincipal principal = (OAuthUserPrincipal) authentication.getPrincipal();
         String token = jwtProvider.generate(principal.getUserId());
-        response.sendRedirect(frontendUrl + "/auth/callback?token=" + token);
+        String redirect = principal.isNew()
+                ? frontendUrl + "/auth/callback?token=" + token + "&setup=true"
+                : frontendUrl + "/auth/callback?token=" + token;
+        response.sendRedirect(redirect);
     }
 }

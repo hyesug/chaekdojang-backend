@@ -15,11 +15,19 @@ public class OAuthRegistrationService {
 
     private final UserRepository userRepository;
 
-    public User getOrRegister(AuthProvider provider, Map<String, Object> attributes) {
+    public record RegistrationResult(User user, boolean isNew) {}
+
+    public RegistrationResult getOrRegister(AuthProvider provider, Map<String, Object> attributes) {
         OAuthUserInfo info = OAuthUserInfo.of(provider, attributes);
 
-        return userRepository.findByProviderIdAndProvider(info.providerId(), provider)
-                .orElseGet(() -> registerNewUser(info));
+        boolean[] created = {false};
+        User user = userRepository.findByProviderIdAndProvider(info.providerId(), provider)
+                .orElseGet(() -> {
+                    created[0] = true;
+                    return registerNewUser(info);
+                });
+        // 이메일 병합으로 기존 계정을 반환한 경우는 신규 아님
+        return new RegistrationResult(user, created[0]);
     }
 
     private User registerNewUser(OAuthUserInfo info) {
