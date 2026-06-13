@@ -30,6 +30,12 @@ public class UserService {
     }
 
     @Transactional
+    public void deleteMe() {
+        Long userId = SecurityUtils.getCurrentUserId();
+        findUser(userId).softDelete();
+    }
+
+    @Transactional
     public UserProfileResponse updateMyProfile(UpdateProfileRequest request) {
         Long userId = SecurityUtils.getCurrentUserId();
         User user = findUser(userId);

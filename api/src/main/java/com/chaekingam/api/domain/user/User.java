@@ -65,4 +65,8 @@ public class User {
         if (bio != null) this.bio = bio;
         if (profileImage != null) this.profileImage = profileImage;
     }
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }

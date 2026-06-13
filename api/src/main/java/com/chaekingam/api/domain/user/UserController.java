@@ -7,6 +7,7 @@ import com.chaekingam.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,13 @@ public class UserController {
     @PatchMapping("/me")
     public ApiResponse<UserProfileResponse> updateMyProfile(@RequestBody UpdateProfileRequest request) {
         return ApiResponse.ok(userService.updateMyProfile(request));
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "계정을 soft delete 처리합니다. JWT 필요.")
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMe() {
+        userService.deleteMe();
     }
 
     @Operation(summary = "독자 추천", description = "같은 책을 읽은 독자를 추천합니다. JWT 필요.")
