@@ -34,8 +34,9 @@ public class ReviewController {
     @GetMapping
     public ApiResponse<Page<ReviewResponse>> getAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.ok(reviewService.getAll(page, size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "recent") String sort) {
+        return ApiResponse.ok(reviewService.getAll(page, size, sort));
     }
 
     @Operation(summary = "독후감 단건 조회", description = "독후감 ID로 특정 독후감을 조회합니다. 인증 불필요.")

@@ -51,10 +51,13 @@ public class ReviewService {
         return ReviewResponse.from(reviewRepository.save(review), 0L, 0L);
     }
 
-    // 페이지네이션 기본: page=0, size=10, 최신순
-    public Page<ReviewResponse> getAll(int page, int size) {
+    // 페이지네이션 기본: page=0, size=10 / sort: recent(최신순) | rating(별점순)
+    public Page<ReviewResponse> getAll(int page, int size, String sort) {
+        Sort order = "rating".equals(sort)
+                ? Sort.by("rating").descending().and(Sort.by("createdAt").descending())
+                : Sort.by("createdAt").descending();
         Page<Review> reviewPage = reviewRepository.findAllByDeletedAtIsNullAndHiddenFalse(
-                PageRequest.of(page, size, Sort.by("createdAt").descending()));
+                PageRequest.of(page, size, order));
         return toResponsePage(reviewPage);
     }
 
