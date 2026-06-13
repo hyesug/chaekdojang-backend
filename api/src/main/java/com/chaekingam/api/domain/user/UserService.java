@@ -1,5 +1,7 @@
 package com.chaekingam.api.domain.user;
 
+import com.chaekingam.api.domain.book.Book;
+import com.chaekingam.api.domain.book.BookRepository;
 import com.chaekingam.api.domain.library.LibraryRepository;
 import com.chaekingam.api.domain.review.ReviewRepository;
 import com.chaekingam.api.domain.user.dto.*;
@@ -23,6 +25,7 @@ public class UserService {
     private final FollowRepository followRepository;
     private final ReviewRepository reviewRepository;
     private final LibraryRepository libraryRepository;
+    private final BookRepository bookRepository;
 
     public UserProfileResponse getMyProfile() {
         Long userId = SecurityUtils.getCurrentUserId();
@@ -48,6 +51,19 @@ public class UserService {
 
         user.updateProfile(request.nickname(), request.bio(), request.profileImage());
         return buildProfile(userId);
+    }
+
+    @Transactional
+    public void setLifeBook(Long bookId) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        User user = findUser(userId);
+        if (bookId == null) {
+            user.updateLifeBook(null);
+        } else {
+            Book book = bookRepository.findById(bookId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.BOOK_NOT_FOUND));
+            user.updateLifeBook(book);
+        }
     }
 
     public UserProfileResponse getUserProfile(Long userId) {

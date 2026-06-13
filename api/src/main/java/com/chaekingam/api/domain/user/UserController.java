@@ -52,6 +52,13 @@ public class UserController {
         return ApiResponse.ok(userService.getReadingStats());
     }
 
+    @Operation(summary = "인생책 설정", description = "나의 인생책을 설정합니다. bookId가 null이면 삭제. JWT 필요.")
+    @PatchMapping("/me/life-book")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void setLifeBook(@RequestBody SetLifeBookRequest request) {
+        userService.setLifeBook(request.bookId());
+    }
+
     @Operation(summary = "다른 유저 프로필 조회", description = "userId로 다른 사용자의 프로필을 조회합니다. 인증 불필요.")
     @GetMapping("/{userId}")
     public ApiResponse<UserProfileResponse> getUserProfile(@PathVariable Long userId) {

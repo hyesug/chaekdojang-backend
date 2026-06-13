@@ -1,5 +1,6 @@
 package com.chaekingam.api.domain.user;
 
+import com.chaekingam.api.domain.book.Book;
 import jakarta.persistence.*;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -56,6 +57,10 @@ public class User {
     @Column(nullable = false, length = 15)
     private UserRole role = UserRole.USER;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "life_book_id")
+    private Book lifeBook;
+
     public static User create(String email, String nickname, String profileImage) {
         User user = new User();
         user.email = email;
@@ -65,6 +70,10 @@ public class User {
         user.country = "KR";
         user.role = UserRole.USER;
         return user;
+    }
+
+    public void updateLifeBook(Book book) {
+        this.lifeBook = book;
     }
 
     public void updateProfile(String nickname, String bio, String profileImage) {

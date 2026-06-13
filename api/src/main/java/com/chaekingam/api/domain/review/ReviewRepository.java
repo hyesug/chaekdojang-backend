@@ -33,6 +33,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findAllByBookIdAndDeletedAtIsNullAndHiddenFalseOrderByCreatedAtDesc(Long bookId);
 
+    @Query(value = "SELECT r FROM Review r WHERE r.deletedAt IS NULL AND r.hidden = false " +
+                   "ORDER BY (SELECT COUNT(rl) FROM ReviewLike rl WHERE rl.review = r) DESC, r.createdAt DESC",
+           countQuery = "SELECT COUNT(r) FROM Review r WHERE r.deletedAt IS NULL AND r.hidden = false")
+    Page<Review> findAllByPopularity(Pageable pageable);
+
     @Query("SELECT new com.chaekingam.api.domain.admin.dto.BookReviewStatResponse(" +
            "b.id, b.title, b.author, COUNT(r)) " +
            "FROM Review r JOIN r.book b " +

@@ -1,5 +1,6 @@
 package com.chaekingam.api.domain.user.dto;
 
+import com.chaekingam.api.domain.book.Book;
 import com.chaekingam.api.domain.user.User;
 
 public record UserProfileResponse(
@@ -10,9 +11,17 @@ public record UserProfileResponse(
         String role,
         long reviewCount,
         long followerCount,
-        long followingCount
+        long followingCount,
+        LifeBook lifeBook
 ) {
+    public record LifeBook(Long id, String title, String author, String thumbnail) {
+        public static LifeBook from(Book book) {
+            return new LifeBook(book.getId(), book.getTitle(), book.getAuthor(), book.getThumbnail());
+        }
+    }
+
     public static UserProfileResponse of(User user, long reviewCount, long followerCount, long followingCount) {
+        LifeBook lifeBook = user.getLifeBook() != null ? LifeBook.from(user.getLifeBook()) : null;
         return new UserProfileResponse(
                 user.getId(),
                 user.getNickname(),
@@ -21,7 +30,8 @@ public record UserProfileResponse(
                 user.getRole().name(),
                 reviewCount,
                 followerCount,
-                followingCount
+                followingCount,
+                lifeBook
         );
     }
 }

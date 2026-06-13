@@ -55,12 +55,13 @@ public class ReviewService {
         ReviewResponse saved = ReviewResponse.from(reviewRepository.save(review), 0L, 0L);
 
         // 책이 있으면 서재에 완독으로 자동 등록 (이미 있으면 상태만 업데이트)
-        if (book != null) {
-            libraryRepository.findByUserIdAndBookId(userId, book.getId())
+        final Book finalBook = book;
+        if (finalBook != null) {
+            libraryRepository.findByUserIdAndBookId(userId, finalBook.getId())
                     .ifPresentOrElse(
                             lib -> lib.updateStatus(LibraryStatus.FINISHED),
                             () -> libraryRepository.save(
-                                    Library.builder().user(author).book(book).status(LibraryStatus.FINISHED).build()
+                                    Library.builder().user(author).book(finalBook).status(LibraryStatus.FINISHED).build()
                             )
                     );
         }
@@ -68,8 +69,11 @@ public class ReviewService {
         return saved;
     }
 
-    // 페이지네이션 기본: page=0, size=10 / sort: recent(최신순) | rating(별점순)
+    // 페이지네이션 기본: page=0, size=10 / sort: recent(최신순) | rating(별점순) | popular(인기순)
     public Page<ReviewResponse> getAll(int page, int size, String sort) {
+        if ("popular".equals(sort)) {
+            return toResponsePage(reviewRepository.findAllByPopularity(PageRequest.of(page, size)));
+        }
         Sort order = "rating".equals(sort)
                 ? Sort.by("rating").descending().and(Sort.by("createdAt").descending())
                 : Sort.by("createdAt").descending();
