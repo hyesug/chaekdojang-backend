@@ -29,7 +29,7 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<Page<AdminUserResponse>>> getUsers(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(
+        return ResponseEntity.ok(ApiResponse.ok(
                 adminService.getUsers(SecurityUtils.getCurrentUserId(), pageable)));
     }
 
@@ -39,14 +39,14 @@ public class AdminController {
             @RequestBody Map<String, String> body) {
         UserRole role = UserRole.valueOf(body.get("role").toUpperCase());
         adminService.setRole(SecurityUtils.getCurrentUserId(), id, role);
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
     // ── 독후감 관리 ─────────────────────────────────────────
     @GetMapping("/reviews")
     public ResponseEntity<ApiResponse<Page<AdminReviewResponse>>> getReviews(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(
+        return ResponseEntity.ok(ApiResponse.ok(
                 adminService.getReviews(SecurityUtils.getCurrentUserId(), pageable)));
     }
 
@@ -55,12 +55,12 @@ public class AdminController {
             @PathVariable Long id,
             @RequestBody Map<String, Boolean> body) {
         adminService.setHidden(SecurityUtils.getCurrentUserId(), id, body.get("hidden"));
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
     @GetMapping("/reviews/stats")
     public ResponseEntity<ApiResponse<List<BookReviewStatResponse>>> getBookStats() {
-        return ResponseEntity.ok(ApiResponse.success(
+        return ResponseEntity.ok(ApiResponse.ok(
                 adminService.getBookStats(SecurityUtils.getCurrentUserId())));
     }
 
@@ -68,13 +68,13 @@ public class AdminController {
     @GetMapping("/inquiries")
     public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getInquiries(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(
+        return ResponseEntity.ok(ApiResponse.ok(
                 adminService.getInquiries(SecurityUtils.getCurrentUserId(), pageable)));
     }
 
     @GetMapping("/inquiries/{id}")
     public ResponseEntity<ApiResponse<InquiryResponse>> getInquiryDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(
+        return ResponseEntity.ok(ApiResponse.ok(
                 adminService.getInquiryDetail(SecurityUtils.getCurrentUserId(), id)));
     }
 
@@ -82,7 +82,7 @@ public class AdminController {
     public ResponseEntity<ApiResponse<InquiryResponse>> addComment(
             @PathVariable Long id,
             @RequestBody Map<String, String> body) {
-        return ResponseEntity.ok(ApiResponse.success(
+        return ResponseEntity.ok(ApiResponse.ok(
                 adminService.addComment(SecurityUtils.getCurrentUserId(), id, body.get("content"))));
     }
 }

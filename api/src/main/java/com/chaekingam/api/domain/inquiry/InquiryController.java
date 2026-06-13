@@ -24,7 +24,7 @@ public class InquiryController {
             @Valid @RequestBody InquiryCreateRequest req,
             Authentication auth) {
         Long userId = getUserId(auth);
-        return ResponseEntity.ok(ApiResponse.success(inquiryService.create(req, userId)));
+        return ResponseEntity.ok(ApiResponse.ok(inquiryService.create(req, userId)));
     }
 
     @GetMapping("/my")
@@ -32,7 +32,7 @@ public class InquiryController {
             Authentication auth,
             @RequestParam(required = false) String email) {
         Long userId = getUserId(auth);
-        return ResponseEntity.ok(ApiResponse.success(inquiryService.getMyInquiries(userId, email)));
+        return ResponseEntity.ok(ApiResponse.ok(inquiryService.getMyInquiries(userId, email)));
     }
 
     @GetMapping("/{id}")
@@ -41,7 +41,7 @@ public class InquiryController {
             Authentication auth,
             @RequestParam(required = false) String email) {
         Long userId = getUserId(auth);
-        return ResponseEntity.ok(ApiResponse.success(inquiryService.getDetail(id, userId, email)));
+        return ResponseEntity.ok(ApiResponse.ok(inquiryService.getDetail(id, userId, email)));
     }
 
     @PatchMapping("/{id}")
@@ -51,7 +51,7 @@ public class InquiryController {
             Authentication auth,
             @RequestParam(required = false) String email) {
         Long userId = getUserId(auth);
-        return ResponseEntity.ok(ApiResponse.success(inquiryService.update(id, req, userId, email)));
+        return ResponseEntity.ok(ApiResponse.ok(inquiryService.update(id, req, userId, email)));
     }
 
     @DeleteMapping("/{id}")
@@ -61,7 +61,7 @@ public class InquiryController {
             @RequestParam(required = false) String email) {
         Long userId = getUserId(auth);
         inquiryService.delete(id, userId, email);
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
     private Long getUserId(Authentication auth) {
