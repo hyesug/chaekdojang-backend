@@ -7,6 +7,7 @@ public record UserProfileResponse(
         String nickname,
         String bio,
         String profileImage,
+        String role,
         long reviewCount,
         long followerCount,
         long followingCount
@@ -17,6 +18,7 @@ public record UserProfileResponse(
                 user.getNickname(),
                 user.getBio(),
                 user.getProfileImage(),
+                user.getRole().name(),
                 reviewCount,
                 followerCount,
                 followingCount
