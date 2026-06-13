@@ -1,6 +1,8 @@
 package com.chaekingam.api.domain.user;
 
 import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -50,6 +52,10 @@ public class User {
     @Column
     private LocalDateTime deletedAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 15)
+    private UserRole role = UserRole.USER;
+
     public static User create(String email, String nickname, String profileImage) {
         User user = new User();
         user.email = email;
@@ -57,6 +63,7 @@ public class User {
         user.profileImage = profileImage;
         user.language = "ko";
         user.country = "KR";
+        user.role = UserRole.USER;
         return user;
     }
 
@@ -73,4 +80,10 @@ public class User {
     public void reactivate() {
         this.deletedAt = null;
     }
+
+    public void promoteToAdmin() { this.role = UserRole.ADMIN; }
+    public void demoteToUser() { this.role = UserRole.USER; }
+    public void setSuperAdmin() { this.role = UserRole.SUPER_ADMIN; }
+    public boolean isAdmin() { return this.role == UserRole.ADMIN || this.role == UserRole.SUPER_ADMIN; }
+    public boolean isSuperAdmin() { return this.role == UserRole.SUPER_ADMIN; }
 }

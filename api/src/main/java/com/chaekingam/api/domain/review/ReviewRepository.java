@@ -1,8 +1,10 @@
 package com.chaekingam.api.domain.review;
 
+import com.chaekingam.api.domain.admin.dto.BookReviewStatResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +24,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findAllByAuthorIdInAndDeletedAtIsNullOrderByCreatedAtDesc(List<Long> authorIds);
 
     List<Review> findAllByBookIdAndDeletedAtIsNullOrderByCreatedAtDesc(Long bookId);
+
+    Page<Review> findAllByDeletedAtIsNullAndHiddenFalse(Pageable pageable);
+
+    @Query("SELECT new com.chaekingam.api.domain.admin.dto.BookReviewStatResponse(" +
+           "b.id, b.title, b.author, COUNT(r)) " +
+           "FROM Review r JOIN r.book b " +
+           "WHERE r.deletedAt IS NULL " +
+           "GROUP BY b.id, b.title, b.author " +
+           "ORDER BY COUNT(r) DESC")
+    List<BookReviewStatResponse> findBookReviewStats();
 }

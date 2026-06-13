@@ -2,6 +2,7 @@ package com.chaekingam.api.domain.user;
 
 import com.chaekingam.api.global.notification.AdminAlertService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,9 @@ public class OAuthRegistrationService {
     private final UserRepository userRepository;
     private final UserAuthProviderRepository authProviderRepository;
     private final AdminAlertService adminAlertService;
+
+    @Value("${admin.super-email:}")
+    private String superAdminEmail;
 
     public record RegistrationResult(User user, boolean isNew) {}
 
@@ -56,6 +60,12 @@ public class OAuthRegistrationService {
         authProviderRepository.save(
                 UserAuthProvider.of(user, provider, info.providerId(), info.email(), info.profileImage())
         );
+
+        // SUPER_ADMIN 이메일이면 자동으로 슈퍼 관리자 권한 부여
+        if (superAdminEmail != null && !superAdminEmail.isBlank()
+                && superAdminEmail.equals(user.getEmail()) && !user.isSuperAdmin()) {
+            user.setSuperAdmin();
+        }
 
         if (isNew) {
             adminAlertService.sendSignupAlert(user.getEmail(), user.getNickname());

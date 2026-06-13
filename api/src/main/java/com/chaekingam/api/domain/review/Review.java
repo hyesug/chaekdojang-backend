@@ -52,6 +52,9 @@ public class Review {
     @Column
     private LocalDateTime deletedAt;
 
+    @Column(nullable = false)
+    private boolean hidden = false;
+
     @Builder
     private Review(Book book, User author, String content, int rating) {
         this.book = book;
@@ -72,4 +75,7 @@ public class Review {
     public boolean isAuthor(Long userId) {
         return this.author.getId().equals(userId);
     }
+
+    public void hide() { this.hidden = true; }
+    public void unhide() { this.hidden = false; }
 }

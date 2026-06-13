@@ -64,6 +64,10 @@ public class SecurityConfig {
                         "/api/users/*/reviews",
                         "/api/users/*"
                 ).permitAll()
+                // 문의: POST·GET 모두 비회원 허용 (권한 체크는 서비스 레이어에서)
+                .requestMatchers("/api/inquiries/**").permitAll()
+                // 관리자 API: 인증 필요 (권한 체크는 서비스 레이어에서)
+                .requestMatchers("/api/admin/**").authenticated()
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth -> oauth

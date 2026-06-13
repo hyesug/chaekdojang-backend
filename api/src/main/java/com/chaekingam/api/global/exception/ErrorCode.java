@@ -27,7 +27,9 @@ public enum ErrorCode {
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방을 찾을 수 없습니다."),
     TRANSLATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "번역에 실패했습니다."),
     SUBSCRIPTION_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 구독 중입니다."),
-    SUBSCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "구독 정보를 찾을 수 없습니다.");
+    SUBSCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "구독 정보를 찾을 수 없습니다."),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "찾을 수 없습니다."),
+    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
 
     private final HttpStatus status;
     private final String message;
