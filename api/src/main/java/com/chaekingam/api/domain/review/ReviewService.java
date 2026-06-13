@@ -53,7 +53,7 @@ public class ReviewService {
 
     // 페이지네이션 기본: page=0, size=10, 최신순
     public Page<ReviewResponse> getAll(int page, int size) {
-        Page<Review> reviewPage = reviewRepository.findAllByDeletedAtIsNull(
+        Page<Review> reviewPage = reviewRepository.findAllByDeletedAtIsNullAndHiddenFalse(
                 PageRequest.of(page, size, Sort.by("createdAt").descending()));
         return toResponsePage(reviewPage);
     }
@@ -89,17 +89,17 @@ public class ReviewService {
         List<Long> followingIds = followRepository.findFollowingIdsByFollowerId(userId);
         if (followingIds.isEmpty()) return List.of();
         return toResponseList(
-                reviewRepository.findAllByAuthorIdInAndDeletedAtIsNullOrderByCreatedAtDesc(followingIds));
+                reviewRepository.findAllByAuthorIdInAndDeletedAtIsNullAndHiddenFalseOrderByCreatedAtDesc(followingIds));
     }
 
     public List<ReviewResponse> getByUser(Long userId) {
         return toResponseList(
-                reviewRepository.findAllByAuthorIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId));
+                reviewRepository.findAllByAuthorIdAndDeletedAtIsNullAndHiddenFalseOrderByCreatedAtDesc(userId));
     }
 
     public List<ReviewResponse> getByBook(Long bookId) {
         return toResponseList(
-                reviewRepository.findAllByBookIdAndDeletedAtIsNullOrderByCreatedAtDesc(bookId));
+                reviewRepository.findAllByBookIdAndDeletedAtIsNullAndHiddenFalseOrderByCreatedAtDesc(bookId));
     }
 
     // ── 내부 헬퍼 ─────────────────────────────────────────────────────────────

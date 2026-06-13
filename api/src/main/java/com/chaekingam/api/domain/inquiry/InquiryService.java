@@ -49,7 +49,9 @@ public class InquiryService {
     public InquiryResponse getDetail(Long id, Long userId, String guestEmail) {
         Inquiry inquiry = inquiryRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
-        assertAccess(inquiry, userId, guestEmail);
+        if (!isAdminUser(userId)) {
+            assertAccess(inquiry, userId, guestEmail);
+        }
         return InquiryResponse.from(inquiry);
     }
 
@@ -68,6 +70,11 @@ public class InquiryService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
         assertAccess(inquiry, userId, guestEmail);
         inquiry.softDelete();
+    }
+
+    private boolean isAdminUser(Long userId) {
+        if (userId == null) return false;
+        return userRepository.findById(userId).map(User::isAdmin).orElse(false);
     }
 
     private void assertAccess(Inquiry inquiry, Long userId, String guestEmail) {
