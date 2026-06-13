@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -87,27 +89,51 @@ public class UserService {
 
     public List<UserRecommendationResponse> getRecommendations() {
         Long myId = SecurityUtils.getCurrentUserId();
-
-        List<Long> myBookIds = libraryRepository.findBookIdsByUserId(myId);
-        if (myBookIds.isEmpty()) {
-            return List.of();
-        }
+        User me = findUser(myId);
 
         List<Long> followingIds = followRepository.findFollowingIdsByFollowerId(myId);
-        List<Long> excludeUserIds = new ArrayList<>(followingIds);
-        excludeUserIds.add(myId);
+        List<Long> excludeIds = new ArrayList<>(followingIds);
+        excludeIds.add(myId);
 
-        List<Object[]> results = libraryRepository.findUsersWithMostBookOverlap(myBookIds, excludeUserIds);
+        Map<Long, Integer> scoreMap = new HashMap<>();
 
-        return results.stream()
-                .limit(5)
-                .map(row -> {
+        // 1. 공통으로 읽은 책: +1점/권
+        List<Long> myBookIds = libraryRepository.findBookIdsByUserId(myId);
+        if (!myBookIds.isEmpty()) {
+            libraryRepository.findUsersWithMostBookOverlap(myBookIds, excludeIds)
+                    .forEach(row -> {
+                        Long userId = ((Number) row[0]).longValue();
+                        int overlap = ((Number) row[1]).intValue();
+                        scoreMap.merge(userId, overlap, Integer::sum);
+                    });
+        }
+
+        // 2. 별점 유사도: 동일 +2점, 차이 1 +1점
+        reviewRepository.findRatingSimilarity(myId, excludeIds)
+                .forEach(row -> {
                     Long userId = ((Number) row[0]).longValue();
-                    int overlapCount = ((Number) row[1]).intValue();
-                    return userRepository.findById(userId)
-                            .map(user -> UserRecommendationResponse.from(user, overlapCount))
-                            .orElse(null);
-                })
+                    int ratingScore = ((Number) row[1]).intValue();
+                    scoreMap.merge(userId, ratingScore, Integer::sum);
+                });
+
+        // 3. 인생책 일치: +5점
+        if (me.getLifeBook() != null) {
+            userRepository.findAllByLifeBook_IdAndDeletedAtIsNull(me.getLifeBook().getId())
+                    .forEach(user -> {
+                        if (!excludeIds.contains(user.getId())) {
+                            scoreMap.merge(user.getId(), 5, Integer::sum);
+                        }
+                    });
+        }
+
+        if (scoreMap.isEmpty()) return List.of();
+
+        return scoreMap.entrySet().stream()
+                .sorted(Map.Entry.<Long, Integer>comparingByValue().reversed())
+                .limit(5)
+                .map(entry -> userRepository.findById(entry.getKey())
+                        .map(user -> UserRecommendationResponse.from(user, entry.getValue()))
+                        .orElse(null))
                 .filter(Objects::nonNull)
                 .toList();
     }

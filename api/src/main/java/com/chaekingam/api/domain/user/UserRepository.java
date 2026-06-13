@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByNicknameContainingIgnoreCase(String nickname);
 
     Page<User> findAllByDeletedAtIsNull(Pageable pageable);
+
+    List<User> findAllByLifeBook_IdAndDeletedAtIsNull(Long lifeBookId);
 }

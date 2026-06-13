@@ -7,15 +7,15 @@ public record UserRecommendationResponse(
         String nickname,
         String profileImage,
         String bio,
-        int overlapCount
+        int score
 ) {
-    public static UserRecommendationResponse from(User user, int overlapCount) {
+    public static UserRecommendationResponse from(User user, int score) {
         return new UserRecommendationResponse(
                 user.getId(),
                 user.getNickname(),
                 user.getProfileImage(),
                 user.getBio(),
-                overlapCount
+                score
         );
     }
 }
