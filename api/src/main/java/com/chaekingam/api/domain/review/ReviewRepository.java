@@ -50,6 +50,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             """)
     List<Object[]> findRatingSimilarity(@Param("myId") Long myId, @Param("excludeIds") List<Long> excludeIds);
 
+    // 내 독후감 페이징 + 키워드 검색 (내용 또는 책 제목)
+    @Query("SELECT r FROM Review r LEFT JOIN r.book b " +
+           "WHERE r.author.id = :userId AND r.deletedAt IS NULL AND r.hidden = false " +
+           "AND (:q IS NULL OR LOWER(r.content) LIKE LOWER(CONCAT('%', :q, '%')) " +
+           "     OR LOWER(b.title) LIKE LOWER(CONCAT('%', :q, '%'))) " +
+           "ORDER BY r.createdAt DESC")
+    Page<Review> findByAuthorWithSearch(
+            @Param("userId") Long userId,
+            @Param("q") String q,
+            Pageable pageable);
+
     @Query(value = "SELECT r FROM Review r WHERE r.deletedAt IS NULL AND r.hidden = false " +
                    "ORDER BY (SELECT COUNT(rl) FROM ReviewLike rl WHERE rl.review = r) DESC, r.createdAt DESC",
            countQuery = "SELECT COUNT(r) FROM Review r WHERE r.deletedAt IS NULL AND r.hidden = false")

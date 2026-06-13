@@ -3,6 +3,7 @@ package com.chaekingam.api.domain.review;
 import com.chaekingam.api.domain.review.dto.ReviewCreateRequest;
 import com.chaekingam.api.domain.review.dto.ReviewResponse;
 import com.chaekingam.api.domain.review.dto.ReviewUpdateRequest;
+import com.chaekingam.api.domain.user.UserService;
 import com.chaekingam.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final UserService userService;
 
     @Operation(summary = "독후감 작성", description = "로그인한 사용자가 새 독후감을 작성합니다. JWT 필요.")
     @PostMapping
@@ -64,5 +66,14 @@ public class ReviewController {
     @GetMapping("/feed")
     public ApiResponse<List<ReviewResponse>> getFeed() {
         return ApiResponse.ok(reviewService.getFeed());
+    }
+
+    @Operation(summary = "취향 피드", description = "취향이 비슷한 추천 유저들의 독후감을 최신순으로 반환합니다. JWT 필요.")
+    @GetMapping("/feed/taste")
+    public ApiResponse<List<ReviewResponse>> getTasteFeed() {
+        List<Long> recommendedIds = userService.getRecommendations().stream()
+                .map(r -> r.id())
+                .toList();
+        return ApiResponse.ok(reviewService.getByTaste(recommendedIds));
     }
 }

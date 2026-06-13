@@ -116,6 +116,19 @@ public class ReviewService {
                 reviewRepository.findAllByAuthorIdInAndDeletedAtIsNullAndHiddenFalseOrderByCreatedAtDesc(followingIds));
     }
 
+    public Page<ReviewResponse> getMyReviews(int page, int size, String q) {
+        Long myId = SecurityUtils.getCurrentUserId();
+        String keyword = (q != null && !q.isBlank()) ? q.trim() : null;
+        return toResponsePage(
+                reviewRepository.findByAuthorWithSearch(myId, keyword, PageRequest.of(page, size)));
+    }
+
+    public List<ReviewResponse> getByTaste(List<Long> recommendedIds) {
+        if (recommendedIds.isEmpty()) return List.of();
+        return toResponseList(
+                reviewRepository.findAllByAuthorIdInAndDeletedAtIsNullAndHiddenFalseOrderByCreatedAtDesc(recommendedIds));
+    }
+
     public List<ReviewResponse> getByUser(Long userId) {
         return toResponseList(
                 reviewRepository.findAllByAuthorIdAndDeletedAtIsNullAndHiddenFalseOrderByCreatedAtDesc(userId));

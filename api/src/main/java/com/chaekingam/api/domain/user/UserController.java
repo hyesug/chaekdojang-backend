@@ -2,6 +2,7 @@ package com.chaekingam.api.domain.user;
 
 import com.chaekingam.api.domain.review.ReviewService;
 import com.chaekingam.api.domain.review.dto.ReviewResponse;
+import org.springframework.data.domain.Page;
 import com.chaekingam.api.domain.user.dto.*;
 import com.chaekingam.api.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +51,15 @@ public class UserController {
     @GetMapping("/me/stats")
     public ApiResponse<ReadingStatsResponse> getReadingStats() {
         return ApiResponse.ok(userService.getReadingStats());
+    }
+
+    @Operation(summary = "내 독후감 목록 (페이징+검색)", description = "내가 쓴 독후감을 페이지 단위로 반환합니다. q로 책 제목·내용 검색. JWT 필요.")
+    @GetMapping("/me/reviews")
+    public ApiResponse<Page<ReviewResponse>> getMyReviews(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String q) {
+        return ApiResponse.ok(reviewService.getMyReviews(page, size, q));
     }
 
     @Operation(summary = "인생책 설정", description = "나의 인생책을 설정합니다. bookId가 null이면 삭제. JWT 필요.")
