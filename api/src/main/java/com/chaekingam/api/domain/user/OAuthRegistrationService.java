@@ -37,6 +37,11 @@ public class OAuthRegistrationService {
                 linked.reactivate();
                 return new RegistrationResult(linked, true);
             }
+            // 재로그인 시에도 SUPER_ADMIN 이메일이면 권한 부여 (최초 1회)
+            if (superAdminEmail != null && !superAdminEmail.isBlank()
+                    && superAdminEmail.equals(linked.getEmail()) && !linked.isSuperAdmin()) {
+                linked.setSuperAdmin();
+            }
             return new RegistrationResult(linked, false);
         }
 
