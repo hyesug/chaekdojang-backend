@@ -70,6 +70,13 @@ public class NotificationService {
                 .forEach(Notification::markAsRead);
     }
 
+    // 전체 삭제
+    @Transactional
+    public void deleteAll() {
+        Long userId = SecurityUtils.getCurrentUserId();
+        notificationRepository.deleteAllByReceiverId(userId);
+    }
+
     // 알림 삭제
     @Transactional
     public void delete(Long notificationId) {

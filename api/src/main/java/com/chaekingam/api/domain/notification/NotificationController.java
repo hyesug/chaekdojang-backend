@@ -44,6 +44,13 @@ public class NotificationController {
         return ApiResponse.ok();
     }
 
+    @Operation(summary = "전체 삭제", description = "JWT 필요.")
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAll() {
+        notificationService.deleteAll();
+    }
+
     @Operation(summary = "알림 삭제", description = "JWT 필요.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
