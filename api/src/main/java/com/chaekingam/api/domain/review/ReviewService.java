@@ -2,6 +2,9 @@ package com.chaekingam.api.domain.review;
 
 import com.chaekingam.api.domain.book.Book;
 import com.chaekingam.api.domain.book.BookRepository;
+import com.chaekingam.api.domain.library.Library;
+import com.chaekingam.api.domain.library.LibraryRepository;
+import com.chaekingam.api.domain.library.LibraryStatus;
 import com.chaekingam.api.domain.review.dto.ReviewCreateRequest;
 import com.chaekingam.api.domain.review.dto.ReviewResponse;
 import com.chaekingam.api.domain.review.dto.ReviewUpdateRequest;
@@ -33,6 +36,7 @@ public class ReviewService {
     private final ReviewLikeRepository reviewLikeRepository;
     private final CommentRepository commentRepository;
     private final FollowRepository followRepository;
+    private final LibraryRepository libraryRepository;
 
     @Transactional
     public ReviewResponse create(ReviewCreateRequest request) {
@@ -48,7 +52,20 @@ public class ReviewService {
                 .author(author).book(book)
                 .content(request.content()).rating(request.rating())
                 .build();
-        return ReviewResponse.from(reviewRepository.save(review), 0L, 0L);
+        ReviewResponse saved = ReviewResponse.from(reviewRepository.save(review), 0L, 0L);
+
+        // 책이 있으면 서재에 완독으로 자동 등록 (이미 있으면 상태만 업데이트)
+        if (book != null) {
+            libraryRepository.findByUserIdAndBookId(userId, book.getId())
+                    .ifPresentOrElse(
+                            lib -> lib.updateStatus(LibraryStatus.FINISHED),
+                            () -> libraryRepository.save(
+                                    Library.builder().user(author).book(book).status(LibraryStatus.FINISHED).build()
+                            )
+                    );
+        }
+
+        return saved;
     }
 
     // 페이지네이션 기본: page=0, size=10 / sort: recent(최신순) | rating(별점순)
