@@ -14,35 +14,48 @@ import java.util.UUID;
 public class OAuthRegistrationService {
 
     private final UserRepository userRepository;
+    private final UserAuthProviderRepository authProviderRepository;
 
     public record RegistrationResult(User user, boolean isNew) {}
 
     public RegistrationResult getOrRegister(AuthProvider provider, Map<String, Object> attributes) {
         OAuthUserInfo info = OAuthUserInfo.of(provider, attributes);
 
-        boolean[] created = {false};
-        User user = userRepository.findByProviderIdAndProvider(info.providerId(), provider)
-                .orElseGet(() -> {
-                    created[0] = true;
-                    return registerNewUser(info);
-                });
-        // 이메일 병합으로 기존 계정을 반환한 경우는 신규 아님
-        return new RegistrationResult(user, created[0]);
-    }
-
-    private User registerNewUser(OAuthUserInfo info) {
-        if (info.email() != null) {
-            Optional<User> existing = userRepository.findByEmail(info.email());
-            if (existing.isPresent()) return existing.get();
+        // 1. 이미 이 소셜 로그인 수단으로 가입된 계정이 있는지 확인
+        Optional<UserAuthProvider> existingAuth =
+                authProviderRepository.findByProviderAndProviderUserId(provider, info.providerId());
+        if (existingAuth.isPresent()) {
+            return new RegistrationResult(existingAuth.get().getUser(), false);
         }
 
-        String nickname = makeUniqueNickname(info.nickname());
-        String email = info.email() != null
-                ? info.email()
-                : info.providerId() + "@" + info.provider().name().toLowerCase() + ".social";
+        // 2. 같은 이메일로 다른 소셜 로그인을 한 계정이 있는지 확인 → 있으면 연결
+        User user;
+        boolean isNew = false;
+        if (info.email() != null) {
+            Optional<User> existingByEmail = userRepository.findByEmail(info.email());
+            if (existingByEmail.isPresent()) {
+                user = existingByEmail.get();
+            } else {
+                user = createNewUser(info);
+                isNew = true;
+            }
+        } else {
+            user = createNewUser(info);
+            isNew = true;
+        }
 
+        // 3. 소셜 로그인 수단 연결
+        authProviderRepository.save(
+                UserAuthProvider.of(user, provider, info.providerId(), info.email(), info.profileImage())
+        );
+
+        return new RegistrationResult(user, isNew);
+    }
+
+    private User createNewUser(OAuthUserInfo info) {
+        String nickname = makeUniqueNickname(info.nickname());
         return userRepository.save(
-                User.createOAuth(email, info.providerId(), nickname, info.profileImage(), info.provider())
+                User.create(info.email(), nickname, info.profileImage())
         );
     }
 

@@ -20,15 +20,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    // 이메일이 없는 OAuth 제공자(카카오 비동의 등)도 가입 가능하도록 nullable
+    @Column(unique = true)
     private String email;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private AuthProvider provider;
-
-    @Column(nullable = false)
-    private String providerId;
 
     @Column(nullable = false, unique = true)
     private String nickname;
@@ -56,12 +50,9 @@ public class User {
     @Column
     private LocalDateTime deletedAt;
 
-    public static User createOAuth(String email, String providerId, String nickname,
-                                    String profileImage, AuthProvider provider) {
+    public static User create(String email, String nickname, String profileImage) {
         User user = new User();
         user.email = email;
-        user.providerId = providerId;
-        user.provider = provider;
         user.nickname = nickname;
         user.profileImage = profileImage;
         user.language = "ko";
