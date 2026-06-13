@@ -6,6 +6,7 @@ import com.chaekingam.api.domain.user.User;
 import com.chaekingam.api.domain.user.UserRepository;
 import com.chaekingam.api.global.exception.CustomException;
 import com.chaekingam.api.global.exception.ErrorCode;
+import com.chaekingam.api.infra.mail.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ public class InquiryService {
 
     private final InquiryRepository inquiryRepository;
     private final UserRepository userRepository;
+    private final MailService mailService;
 
     @Transactional
     public InquiryResponse create(InquiryCreateRequest req, Long userId) {
@@ -30,7 +32,10 @@ public class InquiryService {
 
         Inquiry inquiry = Inquiry.create(req.title(), req.content(), user,
                 req.guestName(), req.guestEmail());
-        return InquiryResponse.from(inquiryRepository.save(inquiry));
+        InquiryResponse saved = InquiryResponse.from(inquiryRepository.save(inquiry));
+        String authorName = user != null ? user.getNickname() : req.guestName();
+        mailService.sendInquiryNotification(authorName, req.title());
+        return saved;
     }
 
     /** 내 문의 목록 — 회원이면 userId, 비회원이면 guestEmail로 조회 */

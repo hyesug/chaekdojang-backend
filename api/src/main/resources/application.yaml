@@ -74,6 +74,8 @@ server:
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
   backend-url: ${BACKEND_URL:http://localhost:8080}
+  notification:
+    admin-email: ${NOTIFICATION_ADMIN_EMAIL:}
 
 kakao:
   api-key: ${KAKAO_API_KEY:}
