@@ -1,116 +1,24 @@
 name: Deploy to EC2
 
-# main 브랜치에 push될 때 자동 실행
 on:
   push:
     branches: [main]
 
 jobs:
-  # ── 1단계: 테스트 ──────────────────────────────────
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Run tests
-        working-directory: ./api
-        run: ./gradlew test --no-daemon
-
-  # ── 2단계: 빌드 & Docker 이미지 푸시 ────────────────
-  build-and-push:
-    name: Build & Push Docker Image
-    runs-on: ubuntu-latest
-    needs: test           # test 통과 후에만 실행
-    outputs:
-      image-tag: ${{ steps.meta.outputs.tags }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Build JAR
-        working-directory: ./api
-        run: ./gradlew bootJar -x test --no-daemon
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/chaekingam-api
-          tags: |
-            type=raw,value=latest
-            type=sha,prefix=sha-
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./api
-          dockerfile: ./api/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-
-  # ── 3단계: EC2 배포 ──────────────────────────────────
   deploy:
-    name: Deploy to EC2
     runs-on: ubuntu-latest
-    needs: build-and-push   # 이미지 푸시 완료 후에만 실행
+
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Copy docker-compose.prod.yml to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.prod.yml"
-          target: "~/chaekingam"
-
-      - name: Deploy on EC2
+      - name: SSH로 EC2 접속 후 배포
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/chaekingam
-
-            # .env 파일은 EC2에 직접 관리 (Git에 올리지 않음)
-            # 최초 배포 시 .env 파일을 EC2에 직접 생성해야 합니다
-
-            # 최신 이미지 Pull
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/chaekingam-api:latest
-
-            # 앱만 재시작 (redis는 유지)
-            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }} \
-            docker compose -f docker-compose.prod.yml up -d --no-deps --pull always app
-
-            # 사용하지 않는 이미지 정리
-            docker image prune -f
-
-            # Nginx 설정 검증 후 무중단 리로드
-            sudo nginx -t && sudo nginx -s reload
-
-            # 헬스체크 (Nginx 통해서 확인)
-            sleep 15
-            curl -f https://$(hostname -f)/actuator/health 2>/dev/null \
-              || curl -f http://localhost:8080/actuator/health || exit 1
+            cd ~/chaekingam-api
+            git pull origin main
+            cd api
+            ./gradlew build -x test --no-daemon
+            sudo systemctl restart chaekingam
+            echo "배포 완료"
