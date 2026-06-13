@@ -25,15 +25,21 @@ public class OAuthRegistrationService {
         Optional<UserAuthProvider> existingAuth =
                 authProviderRepository.findByProviderAndProviderUserId(provider, info.providerId());
         if (existingAuth.isPresent()) {
-            return new RegistrationResult(existingAuth.get().getUser(), false);
+            User linked = existingAuth.get().getUser();
+            // 탈퇴(soft-delete)된 계정이면 기존 provider 레코드 삭제 후 신규 가입으로 처리
+            if (linked.getDeletedAt() != null) {
+                authProviderRepository.delete(existingAuth.get());
+            } else {
+                return new RegistrationResult(linked, false);
+            }
         }
 
-        // 2. 같은 이메일로 다른 소셜 로그인을 한 계정이 있는지 확인 → 있으면 연결
+        // 2. 같은 이메일로 다른 소셜 로그인을 한 계정이 있는지 확인 → 있으면 연결 (탈퇴 계정 제외)
         User user;
         boolean isNew = false;
         if (info.email() != null) {
             Optional<User> existingByEmail = userRepository.findByEmail(info.email());
-            if (existingByEmail.isPresent()) {
+            if (existingByEmail.isPresent() && existingByEmail.get().getDeletedAt() == null) {
                 user = existingByEmail.get();
             } else {
                 user = createNewUser(info);
