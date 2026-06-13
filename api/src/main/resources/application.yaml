@@ -61,7 +61,7 @@ spring:
       max-request-size: 5MB
 
 jwt:
-  secret: ${JWT_SECRET:chaekingam-dev-secret-key-must-be-32chars-ok!}
+  secret: ${JWT_SECRET:chaekdojang-dev-secret-key-must-be-32chars-ok!}
   expiration-ms: 86400000
 
 server:

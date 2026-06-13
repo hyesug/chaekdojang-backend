@@ -16,9 +16,9 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/chaekingam-api
+            cd ~/chaekdojang-api
             git pull origin main
             cd api
             ./gradlew build -x test --no-daemon
-            sudo systemctl restart chaekingam
+            sudo systemctl restart chaekdojang
             echo "배포 완료"

@@ -5,7 +5,7 @@
 services:
   redis:
     image: redis:7-alpine
-    container_name: chaekingam-redis
+    container_name: chaekdojang-redis
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -14,13 +14,13 @@ services:
       retries: 5
 
   app:
-    image: ${DOCKERHUB_USERNAME}/chaekingam-api:latest
-    container_name: chaekingam-app
+    image: ${DOCKERHUB_USERNAME}/chaekdojang-api:latest
+    container_name: chaekdojang-app
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:8080"  # Nginx만 접근 가능, 외부 직접 접근 차단
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/chaekingam
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:5432/chaekdojang
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate

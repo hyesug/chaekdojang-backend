@@ -1,4 +1,4 @@
-# 책인감 (冊人感) — CLAUDE.md
+# 책도장 — CLAUDE.md
 
 ## 프로젝트 개요
 독서 전용 SNS. 독후감 피드 + 팔로우 + 책 단위 채팅 + 도서 커머스.
@@ -26,7 +26,7 @@
 
 ## 패키지 구조
 ```
-com.chaekingam
+com.chaekdojang
 ├── domain
 │   ├── user          # 사용자·팔로우
 │   ├── review        # 독후감 피드

@@ -13,7 +13,7 @@ DOMAIN="${1:?'사용법: ./setup-ec2.sh your-domain.com'}"
 
 echo ""
 echo "==================================================="
-echo "  책인감 EC2 초기 설정"
+echo "  책도장 EC2 초기 설정"
 echo "  도메인: $DOMAIN"
 echo "==================================================="
 echo ""
@@ -41,18 +41,18 @@ echo ">>> [4/5] Nginx 설정 적용"
 
 # nginx 설정 파일에서 YOUR_DOMAIN을 실제 도메인으로 교체 후 복사
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-CONF_SRC="$SCRIPT_DIR/../nginx/chaekingam.conf"
+CONF_SRC="$SCRIPT_DIR/../nginx/chaekdojang.conf"
 
 if [ ! -f "$CONF_SRC" ]; then
-    echo "ERROR: nginx/chaekingam.conf 파일을 찾을 수 없습니다."
+    echo "ERROR: nginx/chaekdojang.conf 파일을 찾을 수 없습니다."
     echo "       먼저 이 레포지토리를 EC2에 클론하거나 파일을 복사해주세요."
     exit 1
 fi
 
 sudo sed "s/YOUR_DOMAIN/$DOMAIN/g" "$CONF_SRC" \
-    | sudo tee /etc/nginx/sites-available/chaekingam > /dev/null
+    | sudo tee /etc/nginx/sites-available/chaekdojang > /dev/null
 
-sudo ln -sf /etc/nginx/sites-available/chaekingam /etc/nginx/sites-enabled/chaekingam
+sudo ln -sf /etc/nginx/sites-available/chaekdojang /etc/nginx/sites-enabled/chaekdojang
 
 # 기본 nginx 사이트 비활성화
 sudo rm -f /etc/nginx/sites-enabled/default
@@ -85,8 +85,8 @@ echo "==================================================="
 echo ""
 echo "  다음 단계:"
 echo "  1. 앱 폴더 생성 및 환경변수 설정:"
-echo "     mkdir ~/chaekingam"
-echo "     nano ~/chaekingam/.env   ← .env.example 참고"
+echo "     mkdir ~/chaekdojang"
+echo "     nano ~/chaekdojang/.env   ← .env.example 참고"
 echo ""
 echo "  2. 첫 배포:"
 echo "     main 브랜치에 push하면 GitHub Actions가 자동 배포"

@@ -5,9 +5,9 @@
 services:
   db:
     image: postgres:17-alpine
-    container_name: chaekingam-db
+    container_name: chaekdojang-db
     environment:
-      POSTGRES_DB: chaekingam
+      POSTGRES_DB: chaekdojang
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
@@ -15,14 +15,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d chaekingam"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d chaekdojang"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: chaekingam-redis
+    container_name: chaekdojang-redis
     ports:
       - "6379:6379"
     healthcheck:
@@ -35,11 +35,11 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
-    container_name: chaekingam-app
+    container_name: chaekdojang-app
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/chaekingam
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/chaekdojang
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       REDIS_HOST: redis
