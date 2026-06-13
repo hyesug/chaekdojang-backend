@@ -63,6 +63,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             @Param("q") String q,
             Pageable pageable);
 
+    // 관리자용: 작성자 닉네임·책 제목 검색 + 페이징 (삭제되지 않은 전체)
+    @Query("SELECT r FROM Review r LEFT JOIN r.book b LEFT JOIN r.author u " +
+           "WHERE r.deletedAt IS NULL " +
+           "AND (CAST(:author AS string) IS NULL OR LOWER(u.nickname) LIKE LOWER(CONCAT('%', CAST(:author AS string), '%'))) " +
+           "AND (CAST(:title AS string) IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', CAST(:title AS string), '%'))) " +
+           "ORDER BY r.createdAt DESC")
+    Page<Review> findAllByDeletedAtIsNullWithSearch(
+            @Param("author") String author,
+            @Param("title") String title,
+            Pageable pageable);
+
     @Query(value = "SELECT r FROM Review r WHERE r.deletedAt IS NULL AND r.hidden = false " +
                    "ORDER BY (SELECT COUNT(rl) FROM ReviewLike rl WHERE rl.review = r) DESC, r.createdAt DESC",
            countQuery = "SELECT COUNT(r) FROM Review r WHERE r.deletedAt IS NULL AND r.hidden = false")

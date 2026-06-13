@@ -63,9 +63,11 @@ public class AdminService {
     }
 
     // ── 독후감 관리 ─────────────────────────────────────────
-    public Page<AdminReviewResponse> getReviews(Long adminId, Pageable pageable) {
+    public Page<AdminReviewResponse> getReviews(Long adminId, String author, String title, Pageable pageable) {
         assertAdmin(adminId);
-        return reviewRepository.findAllByDeletedAtIsNull(pageable)
+        String a = (author != null && !author.isBlank()) ? author.trim() : null;
+        String t = (title != null && !title.isBlank()) ? title.trim() : null;
+        return reviewRepository.findAllByDeletedAtIsNullWithSearch(a, t, pageable)
                 .map(AdminReviewResponse::from);
     }
 

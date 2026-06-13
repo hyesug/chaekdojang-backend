@@ -45,9 +45,11 @@ public class AdminController {
     // ── 독후감 관리 ─────────────────────────────────────────
     @GetMapping("/reviews")
     public ResponseEntity<ApiResponse<Page<AdminReviewResponse>>> getReviews(
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String title,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.ok(
-                adminService.getReviews(SecurityUtils.getCurrentUserId(), pageable)));
+                adminService.getReviews(SecurityUtils.getCurrentUserId(), author, title, pageable)));
     }
 
     @PatchMapping("/reviews/{id}/hidden")
