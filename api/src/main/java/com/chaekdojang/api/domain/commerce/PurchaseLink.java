@@ -36,10 +36,17 @@ public class PurchaseLink {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private long clickCount = 0;
+
     @Builder
     private PurchaseLink(Book book, PurchaseProvider provider, String url) {
         this.book = book;
         this.provider = provider;
         this.url = url;
+    }
+
+    public void increaseClickCount() {
+        this.clickCount++;
     }
 }
