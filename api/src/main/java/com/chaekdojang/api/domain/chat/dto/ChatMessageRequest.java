@@ -1,3 +1,10 @@
 package com.chaekdojang.api.domain.chat.dto;
 
-public record ChatMessageRequest(String content) {}
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record ChatMessageRequest(
+        @NotBlank
+        @Size(max = 1000)
+        String content
+) {}
