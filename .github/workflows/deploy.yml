@@ -107,7 +107,9 @@ jobs:
           cd /home/ubuntu/chaekdojang-api
           git config --global --add safe.directory /home/ubuntu/chaekdojang-api
           git remote set-url origin https://github.com/hyesug/chaekdojang-api.git
-          git pull --ff-only origin main
+          # 비공개 저장소: 서버에 저장한 인증(만료될 수 있음) 대신 이 배포 작업의 GitHub 토큰(GHCR_TOKEN = github.token, contents:read)을
+          # 이번 pull 한 번만 헤더로 쓴다. 디스크에 남기지 않고, 작업이 끝나면 토큰도 만료된다.
+          git -c credential.helper= -c "http.https://github.com/.extraheader=AUTHORIZATION: basic \$(printf 'x-access-token:%s' "\$GHCR_TOKEN" | base64 -w0)" pull --ff-only origin main
           mkdir -p deploy_history
 
           test -f .env.production
