@@ -34,7 +34,7 @@ public class OpenAiReviewSummaryClient {
         String text = extractOutputText(response);
         try {
             AiSummaryResult result = normalize(objectMapper.readValue(text, AiSummaryResult.class));
-            validate(result);
+            validate(result, content);
             return result;
         } catch (Exception e) {
             throw new IllegalStateException("AI summary JSON parsing failed: " + e.getMessage(), e);
@@ -50,6 +50,7 @@ public class OpenAiReviewSummaryClient {
                                 "content", """
                                         당신은 책도장 독후감 요약카드를 만드는 편집자입니다.
                                         반드시 JSON만 반환하세요. 사용자의 독후감 본문에 없는 사실을 만들지 마세요.
+                                        impressivePoint는 감상이나 해석이 아니라, 아래 독후감 본문에서 공백과 문장부호까지 그대로 이어진 한 문장 또는 문장 일부를 그대로 복사해야 합니다. 따옴표는 붙이지 마세요.
                                         recommendedFor는 반드시 마지막 단어가 "사람"이어야 합니다.
                                         예: 익숙한 일상의 의미를 다시 보고 싶은 사람
                                         """
@@ -141,7 +142,7 @@ public class OpenAiReviewSummaryClient {
         return value == null ? "" : value.trim();
     }
 
-    private void validate(AiSummaryResult result) {
+    private void validate(AiSummaryResult result, String reviewContent) {
         if (result.oneLineReview() == null || result.oneLineReview().isBlank()
                 || result.oneLineReview().length() > 180) {
             throw new IllegalStateException("oneLineReview must be 1-180 characters.");
@@ -155,8 +156,9 @@ public class OpenAiReviewSummaryClient {
             throw new IllegalStateException("recommendedFor must be 1-200 characters and end with '사람'.");
         }
         if (result.impressivePoint() == null || result.impressivePoint().isBlank()
-                || result.impressivePoint().length() > 300) {
-            throw new IllegalStateException("impressivePoint must be 1-300 characters.");
+                || result.impressivePoint().length() > 300
+                || !reviewContent.contains(result.impressivePoint())) {
+            throw new IllegalStateException("impressivePoint must be an exact excerpt from the review body.");
         }
     }
 }
