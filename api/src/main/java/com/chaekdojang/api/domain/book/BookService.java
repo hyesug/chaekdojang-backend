@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class BookService {
         String titleFilter = normalizeSearchText(query);
         String authorFilter = normalizeSearchText(author);
         String publisherFilter = normalizeSearchText(publisher);
-        if (searchQuery.isBlank()) return List.of();
+        if (titleFilter.isBlank() && authorFilter.isBlank() && publisherFilter.isBlank()) return List.of();
         String cacheKey = bookSearchCacheKey(titleFilter, authorFilter, publisherFilter);
         List<BookResponse> cached = readBookSearchCache(cacheKey);
         if (cached != null) return cached;
@@ -265,7 +266,7 @@ public class BookService {
     }
 
     private String bookSearchCacheKey(String title, String author, String publisher) {
-        return "book-search:v3:" + title + ":" + author + ":" + publisher;
+        return "book-search:v4:" + title + ":" + author + ":" + publisher;
     }
 
     private List<BookResponse> readBookSearchCache(String key) {
@@ -288,7 +289,7 @@ public class BookService {
 
     private String normalizeSearchText(String value) {
         if (value == null) return "";
-        return value.replaceAll("\\s+", "").toLowerCase();
+        return value.replaceAll("[\\s,]+", "").toLowerCase(Locale.ROOT);
     }
 
     private boolean isIsbnQuery(String value) {
@@ -296,13 +297,19 @@ public class BookService {
     }
 
     private boolean matchesFilters(BookSearchResult result, String title, String author, String publisher) {
-        if (!title.isBlank() && !isIsbnQuery(title) && !normalizeSearchText(result.title()).contains(title)) {
+        if (!title.isBlank() && !isIsbnQuery(title) && !matchesFreeTextQuery(result, title)) {
             return false;
         }
         if (!author.isBlank() && !normalizeSearchText(result.author()).contains(author)) {
             return false;
         }
         return publisher.isBlank() || normalizeSearchText(result.publisher()).contains(publisher);
+    }
+
+    private boolean matchesFreeTextQuery(BookSearchResult result, String query) {
+        return normalizeSearchText(result.title()).contains(query)
+                || normalizeSearchText(result.author()).contains(query)
+                || normalizeSearchText(result.publisher()).contains(query);
     }
 
     private String bookKey(Book book) {

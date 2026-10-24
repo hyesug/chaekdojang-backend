@@ -57,10 +57,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("""
             SELECT b FROM Book b
-            WHERE (:title = '' OR REPLACE(LOWER(COALESCE(b.title, '')), ' ', '') LIKE CONCAT('%', :title, '%')
+            WHERE (:title = '' OR REPLACE(REPLACE(LOWER(COALESCE(b.title, '')), ' ', ''), ',', '') LIKE CONCAT('%', :title, '%')
+                   OR REPLACE(REPLACE(LOWER(COALESCE(b.author, '')), ' ', ''), ',', '') LIKE CONCAT('%', :title, '%')
+                   OR REPLACE(REPLACE(LOWER(COALESCE(b.publisher, '')), ' ', ''), ',', '') LIKE CONCAT('%', :title, '%')
                    OR LOWER(COALESCE(b.isbn13, '')) LIKE CONCAT('%', :title, '%'))
-              AND (:author = '' OR REPLACE(LOWER(COALESCE(b.author, '')), ' ', '') LIKE CONCAT('%', :author, '%'))
-              AND (:publisher = '' OR REPLACE(LOWER(COALESCE(b.publisher, '')), ' ', '') LIKE CONCAT('%', :publisher, '%'))
+              AND (:author = '' OR REPLACE(REPLACE(LOWER(COALESCE(b.author, '')), ' ', ''), ',', '') LIKE CONCAT('%', :author, '%'))
+              AND (:publisher = '' OR REPLACE(REPLACE(LOWER(COALESCE(b.publisher, '')), ' ', ''), ',', '') LIKE CONCAT('%', :publisher, '%'))
             """)
     List<Book> searchByFilters(
             @Param("title") String title,
