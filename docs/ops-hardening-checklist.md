@@ -187,10 +187,6 @@ AWS·Vercel 구성:
   - `BACKEND_URL=https://staging-api.chaekdojang.com`
   - `CORS_ALLOWED_ORIGINS=<Vercel 스테이징 URL>`
 
-현재 상태 (2026-10-27 확인):
-
-- 스테이징 API EC2는 2026-10-14에 직접 중지한 상태입니다. 스테이징 API를 쓰려면 EC2를 먼저 시작해야 합니다.
-
 ## 관리자 감사 로그
 
 준비된 코드:
@@ -204,7 +200,7 @@ AWS·Vercel 구성:
 
 프론트엔드:
 
-- 관리자 화면(`app/admin/page.tsx`)에 감사 로그 조회가 들어가 있습니다 (2026-10-27 확인).
+- 관리자 화면(`app/admin/page.tsx`)에 감사 로그 조회가 들어가 있습니다.
 
 ## S3 파일 업로드
 
@@ -235,7 +231,7 @@ S3_PRESIGNED_URL_EXPIRATION_MINUTES=10
 - 버킷 CORS에 운영·스테이징·로컬 프론트엔드 주소를 넣었습니다.
 - `cdn.chaekdojang.com`용 ACM 인증서를 발급해 CloudFront에 붙였습니다.
 
-Cloudflare DNS 레코드 (2026-10-27 기준 모두 등록됨):
+Cloudflare DNS 레코드:
 
 ```text
 Type: CNAME
