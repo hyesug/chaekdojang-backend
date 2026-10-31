@@ -358,7 +358,7 @@ public class AdminService {
                 item.durationSumMs += event.getDurationMs();
                 item.durationCount++;
             }
-            item.referrers.merge(referrerLabel(event.getReferrer()), 1L, Long::sum);
+            item.referrers.merge(ReferrerLabels.of(event.getReferrer()), 1L, Long::sum);
             if (item.lastAt == null || event.getCreatedAt().isAfter(item.lastAt)) item.lastAt = event.getCreatedAt();
         });
         return summaries.values().stream()
@@ -547,19 +547,6 @@ public class AdminService {
             case "session_end" -> "페이지 이탈";
             default -> eventType;
         };
-    }
-
-    private String referrerLabel(String referrer) {
-        if (referrer == null || referrer.isBlank()) return "직접 방문";
-        if (referrer.equals("chaekdojang://invite/kakao-reading-group")) return "카카오 독서모임 초대 유입";
-        if (referrer.equals("chaekdojang://invite/reading-group-link")) return "독서모임 초대 링크 유입";
-        String value = referrer.toLowerCase();
-        if (value.contains("brunch")) return "브런치";
-        if (value.contains("google")) return "구글";
-        if (value.contains("naver")) return "네이버";
-        if (value.contains("instagram")) return "인스타그램";
-        if (value.contains("chaekdojang")) return "책도장 내부";
-        return referrer;
     }
 
     private String topReferrer(Map<String, Long> referrers) {
